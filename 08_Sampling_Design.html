@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Sampling Design mit R</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nils Ratnaweera" />
+    <meta name="date" content="2021-11-18" />
+    <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="site_libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="site_libs/shareon-1.4.1/shareon.min.css" rel="stylesheet" />
+    <script src="site_libs/shareon-1.4.1/shareon.min.js"></script>
+    <link href="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.js"></script>
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Sampling Design mit R
+## CAS FAB: Räumliche Daten in R
+### Nils Ratnaweera
+### Forschungsgruppe Geoinformatik
+### 2021-11-18
+
+---
+
+<style>.shareagain-bar {
+--shareagain-foreground: rgb(255, 255, 255);
+--shareagain-background: rgba(0, 0, 0, 0.5);
+--shareagain-twitter: none;
+--shareagain-facebook: none;
+--shareagain-linkedin: none;
+--shareagain-pinterest: none;
+--shareagain-pocket: none;
+--shareagain-reddit: none;
+}</style>
+
+
+## Sampling Desing mit R
+
+![:scale 60%](images/sampling-design-folie.png)
+
+???
+
+R eignet sich hervorragend um ein Sampling Design umzusetzen
+
+---
+
+Unser Sampling Design (2 Varianten):
+
+1. systematisch
+2. zufällig 
+
+
+
+```r
+library(sf)
+library(terra)
+library(tmap)
+
+tww_landquart &lt;- read_sf("_data/tww_landquart.gpkg")
+```
+
+
+
+
+---
+layout: true
+
+
+## Zufällig und gleichmässig verteilt
+
+---
+
+
+- Gleich viele samples (10) pro *Multi*polygon
+- Samples sind zufällig verteilt
+
+
+```r
+tww_landquart$equal_samples &lt;- 10
+sample_plots1 &lt;- st_sample(tww_landquart, size = tww_landquart$equal_samples, by_polygon = TRUE)
+```
+
+
+![](08_Sampling_Design_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+---
+
+
+
+- Gleich viele samples (10) pro ~~Multi~~polygon
+- Samples sind zufällig verteilt
+
+
+
+```r
+tww_landquart_polygon &lt;- st_cast(tww_landquart, "POLYGON")
+```
+
+--
+
+.pull-left[
+
+`tww_landquart` (12 Zeilen):
+
+
+|Name          |geom                           |
+|:-------------|:------------------------------|
+|Hinter Wals   |MULTIPOLYGON (((2759519 120... |
+|Frettis       |MULTIPOLYGON (((2759987 120... |
+|Prafieb       |MULTIPOLYGON (((2759525 120... |
+|Gissübel      |MULTIPOLYGON (((2759970 120... |
+|Unter Vajuoza |MULTIPOLYGON (((2758686 120... |
+|Jerätsch      |MULTIPOLYGON (((2758287 120... |
+]
+
+--
+
+.pull-right[
+
+`tww_landquart_polygon` (25 Zeilen):
+
+
+|Name        |geom                           |
+|:-----------|:------------------------------|
+|Hinter Wals |POLYGON ((2759519 1203997, ... |
+|Frettis     |POLYGON ((2759987 1203832, ... |
+|Frettis     |POLYGON ((2760100 1203679, ... |
+|Frettis     |POLYGON ((2760247 1203553, ... |
+|Frettis     |POLYGON ((2759998 1203769, ... |
+|Prafieb     |POLYGON ((2759525 1202646, ... |
+]
+
+
+
+
+
+---
+
+.pull-left[
+![](08_Sampling_Design_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+]
+
+
+.pull-right[
+![](08_Sampling_Design_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+]
+
+---
+layout: true
+
+## Zufällig und in Abhängigkeit der Flächengrösse verteilt
+
+---
+
+- Anzahl Samples ist abhängig von der Flächengrösse (1 Sample pro 4'000 m2)
+- Samples sind zufällig verteilt
+
+
+```r
+tww_landquart_polygon$SHAPE_Area &lt;- st_area(tww_landquart_polygon) # Flächengrösse muss aktualisiert werden!
+
+tww_landquart_polygon$relative_samples &lt;- as.integer(round(tww_landquart_polygon$SHAPE_Area/4000))
+```
+
+--
+
+
+|Name        |      SHAPE_Area| relative_samples|geom                           |
+|:-----------|---------------:|----------------:|:------------------------------|
+|Hinter Wals | 10908.772 [m^2]|                3|POLYGON ((2759519 1203997, ... |
+|Frettis     |  9207.345 [m^2]|                2|POLYGON ((2759987 1203832, ... |
+|Frettis     |  8849.699 [m^2]|                2|POLYGON ((2760100 1203679, ... |
+|Frettis     |  6833.655 [m^2]|                2|POLYGON ((2760247 1203553, ... |
+|Frettis     |  6640.134 [m^2]|                2|POLYGON ((2759998 1203769, ... |
+|Prafieb     | 37675.214 [m^2]|                9|POLYGON ((2759525 1202646, ... |
+
+--
+
+
+
+```r
+sample_plots2 &lt;- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples, by_polygon = TRUE)
+```
+
+---
+
+![](08_Sampling_Design_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+---
+layout: false
+
+## Gleichmässig verteilt
+
+- Regelmässige Verteilung der Samples (auf einem "Raster")
+- Implizit abhängig von der Flächengrösse (grosse Polygone erhalten mehr Samples)
+
+
+```r
+sample_plots3 &lt;- st_sample(tww_landquart, size = 200, type = "regular")
+```
+
+--
+
+![](08_Sampling_Design_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

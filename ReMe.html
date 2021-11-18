@@ -1,0 +1,948 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>ReMe</title>
+
+<script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
+<script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<style>h1 {font-size: 34px;}
+       h1.title {font-size: 38px;}
+       h2 {font-size: 30px;}
+       h3 {font-size: 24px;}
+       h4 {font-size: 18px;}
+       h5 {font-size: 16px;}
+       h6 {font-size: 12px;}
+       code {color: inherit; background-color: rgba(0, 0, 0, 0.04);}
+       pre:not([class]) { background-color: white }</style>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">
+  code{white-space: pre-wrap;}
+  span.smallcaps{font-variant: small-caps;}
+  span.underline{text-decoration: underline;}
+  div.column{display: inline-block; vertical-align: top; width: 50%;}
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+  ul.task-list{list-style: none;}
+    </style>
+
+<style type="text/css">code{white-space: pre;}</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+img {
+  max-width:100%;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+pre code {
+  padding: 0;
+}
+</style>
+
+
+<style type="text/css">
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #adb5bd;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script type="text/javascript">
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.tab('show');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+
+  // Navbar adjustments
+  var navHeight = $(".navbar").first().height() + 15;
+  var style = document.createElement('style');
+  var pt = "padding-top: " + navHeight + "px; ";
+  var mt = "margin-top: -" + navHeight + "px; ";
+  var css = "";
+  // offset scroll position for anchor links (for fixed navbar)
+  for (var i = 1; i <= 6; i++) {
+    css += ".section h" + i + "{ " + pt + mt + "}\n";
+  }
+  style.innerHTML = "body {" + pt + "padding-bottom: 40px; }\n" + css;
+  document.head.appendChild(style);
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+  background-color: transparent;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">CAS FAB: Räumliche Daten in R</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Einführung</a>
+</li>
+<li>
+  <a href="Vektordaten.html">Vektordaten</a>
+</li>
+<li>
+  <a href="Rasterdaten.html">Rasterdaten</a>
+</li>
+<li>
+  <a href="Advanced.html">Fortgeschritten</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div id="header">
+
+
+
+
+</div>
+
+
+<p>Methoden-Modul</p>
+<p>MScUmwelt und NatürlicheRessourcen</p>
+<div id="spatial-data-science-1" class="section level1">
+<h1>Spatial Data Science 1</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS200.png" /></p>
+</div>
+<div id="patrick-laube-nils-ratnaweera-nikos-bakogiannis" class="section level1">
+<h1>Patrick Laube, Nils Ratnaweera &amp; Nikos Bakogiannis</h1>
+<p>Geoinformatics Research Group</p>
+<p>Institute of Natural Resource Sciences<br />
+ZHAW Zurich University of Applied Sciences Grüental, Postfach, CH-8820 Wädenswil</p>
+<p>{laup, rata, <a href="mailto:bako%7D@zhaw.ch" class="email">bako}@zhaw.ch</a></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS201.jpg" /></p>
+<p><span style="color:#D30000">Screencast</span></p>
+<p><span style="color:#D30000">Teil 1</span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS202.jpg" /></p>
+<p><strong>“80%</strong> <strong>of</strong> <strong>all data is</strong> <em>georeferenced</em></p>
+<p><strong>-</strong> <strong>t</strong> <strong>hat</strong> <strong>is,</strong> <strong>it refers</strong> <strong>to some specific place on the Earth’s surface</strong> <strong>.”</strong></p>
+<p>Al Gore, TheDigital Earth: Understanding our planet in the 21stCentury, 1998</p>
+</div>
+<div id="zitat-al-gore-80-aller-information-ist-räumlich" class="section level1">
+<h1>Zitat Al Gore: «80% aller Information ist räumlich»</h1>
+<p>Bildquelle: <a href="https://images.newscientist.com/wp-content/uploads/2017/08/11160128/ac28y703-2-800x533.jpg" class="uri">https://images.newscientist.com/wp-content/uploads/2017/08/11160128/ac28y703-2-800x533.jpg</a></p>
+</div>
+<div id="analyzing-and-modelling-animal-vehicle-collision-hot-spots-for-the-swiss-road-network" class="section level1">
+<h1>Analyzing and modelling animal-vehicle collision hot-spots for the Swiss road network</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS203.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS204.png" /></p>
+<p>dpa, <a href="https://www.wetterauer-zeitung.de/wetterau/friedberg-ort28695/tun-wenn-vors-auto-laeuft-12268905.html" class="uri">https://www.wetterauer-zeitung.de/wetterau/friedberg-ort28695/tun-wenn-vors-auto-laeuft-12268905.html</a></p>
+<p><strong>FG Wildtiermanagement</strong></p>
+<p>StefanM. Suter, Martina Reifler-Bächtiger, Tanja Koch,AnnetteStephani, Benjamin Sigrist, Roland F.Graf</p>
+<p><strong>FG</strong> <strong>Geoinformatik</strong></p>
+<p>PatrickLaube, NilsRatnaweera</p>
+<p><strong>Inst</strong> <strong>. für</strong> <strong>Angew</strong> <strong>.</strong> <strong>Simulation</strong> <strong>IAS</strong></p>
+<p>IvoKaelin, AnnaWróbel</p>
+</div>
+<div id="lernziele" class="section level1">
+<h1>Lernziele</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS205.png" /></p>
+<p><span style="color:#9A291F">Sie können in eigenen Worten und anhand selbst gewählter Beispiele unter der Verwendung von Fachsprache erklären, inwiefern sich räumliche Daten von nicht-räumlichen Daten unterscheiden und welche Implikationen diese</span> <span style="color:#9A291F"> <strong>Unterschiede</strong> </span> <span style="color:#9A291F">für die Datenverarbeitung haben.</span></p>
+<p><span style="color:#9A291F">Sie kennen die grundlegenden</span> <span style="color:#9A291F"> <strong>konzeptuellen Datenmodelle</strong> </span> <span style="color:#9A291F">und</span> <span style="color:#9A291F"> <strong>Datenstrukturen</strong> </span> <span style="color:#9A291F">für</span> <span style="color:#9A291F">Geodaten</span> <span style="color:#9A291F">.</span></p>
+<p><span style="color:#9A291F">Sie sind in der Lage eigene, nicht-räumliche Punktdaten durch die Verwendung von</span> <span style="color:#9A291F"> <strong>Spatial</strong> </span> <span style="color:#9A291F"> <strong>Joins</strong> </span> <span style="color:#9A291F">und</span> <span style="color:#9A291F"> <strong>Pufferoperationen</strong> </span> <span style="color:#9A291F">mit räumlicher Information anzureichern.</span></p>
+<p><span style="color:#9A291F">Sie sind vertraut mit der</span> <span style="color:#9A291F"> <strong>Aggregationseigenschaft</strong> </span> <span style="color:#9A291F">von räumlicher Information, können diese anhand des</span> <span style="color:#9A291F">Modifiable</span> <span style="color:#9A291F">Areal Unit Problems (MAUP) mit Fachsprache beschreiben und kennen methodische Herangehensweisen zum Umgang mit dem MAUP.</span></p>
+<p><span style="color:#9A291F">und all das machen wir mit</span> <span style="color:#9A291F"> <strong>R</strong> </span> <span style="color:#9A291F">(und nicht mit GIS)!</span></p>
+</div>
+<div id="programm" class="section level1">
+<h1>Programm</h1>
+<p><strong>“What is special about spatial?”</strong></p>
+<p>DasganzkleineGeodatenEinmaleins</p>
+<p>RäumlicheAnnotation vonPunktdaten(Spatial Join)</p>
+<p>NachbarschaftundNähe(Puffer)</p>
+<p>RäumlicheAggregation (MAUP)</p>
+</div>
+<div id="zitat-al-gore-80-aller-information-ist-räumlich-1" class="section level1">
+<h1>Zitat Al Gore: «80% aller Information ist räumlich»</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS206.jpg" /></p>
+<p>“A newwave of technological innovation is allowing us to capture, store, process and display an unprecedented amount of information about our planet and a wide variety of environmental and cultural phenomena. Much of this informationwillbe”georeferenced" - that is, it will refer to some specific place on the Earth’s surface.” (The Digital Earth: Understanding our planet in the 21stCentury, 1998)</p>
+<p>einigeQuellenweisendas 80%-ZitatAl Gorezu…</p>
+<p>Bildquelle: <a href="https://images.newscientist.com/wp-content/uploads/2017/08/11160128/ac28y703-2-800x533.jpg" class="uri">https://images.newscientist.com/wp-content/uploads/2017/08/11160128/ac28y703-2-800x533.jpg</a></p>
+</div>
+<div id="wissenschaftliche-studie-zur-frage" class="section level1">
+<h1>Wissenschaftliche Studie zur Frage</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS207.png" /></p>
+<p>“Ananalysis of the1.3 Mio German Wikipedia articles showsthat 78% of all articles have a coordinate themselves or are directly linked toat leastone article that has geospatialcoordinates” (Hanmann&amp;Burghardt2013)</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS208.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS209.png" /></p>
+<p>Hahmann, S., &amp;Burghardt, D. (2013). How much information is geospatiallyreferenced?</p>
+<p>Networksand cognition. <em>International Journal of Geographical Information Science</em> , 27(6), 1171-1189.</p>
+</div>
+<div id="frage-was-ist-speziell-an-räumlichen-daten" class="section level1">
+<h1>Frage: Was ist speziell an räumlichen Daten?</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2010.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2011.png" /></p>
+<p>Wasmeinst Du,weshalb sagen wir räumliche Information ist speziell?</p>
+<p>Notiere Dir einigeStichworte, weshalb räumliche Information speziell sein soll.</p>
+<p>min.</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2012.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2013.gif" /></p>
+<p>Bildquellen: <a href="https://www.srf.ch/meteo" class="uri">https://www.srf.ch/meteo</a>, <a href="https://www.bfs.admin.ch" class="uri">https://www.bfs.admin.ch</a></p>
+</div>
+<div id="eigenschaften-von-räumlichen-daten" class="section level1">
+<h1>Eigenschaften von räumlichen Daten</h1>
+<ul>
+<li><strong>Lageinformation</strong>
+<ul>
+<li>Absolute Lage (x,y,z), Koordinatensysteme</li>
+<li>Relative Lage (Dinge zueinander), Nachbarschaft, Topologie</li>
+</ul></li>
+<li><strong>Zeitinformation</strong>
+<ul>
+<li>Absolute Zeit (Wann sind Daten gültig? Wann wurden Daten erhoben?)</li>
+<li>Relative Zeit (gerade inUmweltwiss. ist Veränderung zentral)</li>
+<li>Euer Vorteil: mit Zeiten rechnen in R könnt ihr schon!</li>
+</ul></li>
+<li>Grundannahme der <strong>Unabhängigkeit</strong> von Stichproben <span style="color:#FF0000"> <strong>gilt nicht!</strong> </span>
+<ul>
+<li>Geodatensind räumlich und oft zeitlich (auto-)korreliert</li>
+<li>Geostatistik bietet Analysemethoden, welche diese Abhängigkeiten berücksichtigen</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2014.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2015.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2016.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2017.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2018.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2019.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2020.gif" /></p>
+</div>
+<div id="spatial-is-special-massstabsabhängigkeit" class="section level1">
+<h1>Spatial is special: Massstabsabhängigkeit</h1>
+<p>Fast alle räumlichen Daten müssen mit einem <strong>Raumbezug/Massstab</strong> gemacht werden(Einw/km2,Einwpro Gemeinde/Kanton)</p>
+<p>Daten verändern sich mit dem Massstab (Bild)</p>
+<p>Bsp. Je nach Auflösung der Drohnenbilder (cm vs. m) verändern sich die ökologischen Indikatoren <em>Uferlänge</em> oder <em>Anzahl_Inseln</em> .</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2021.png" /></p>
+<p>Geilhausen, M., Laube, P., Ochsner, P.</p>
+<p>andDoering, M.(2016).A Matchmade</p>
+<p>inHeaven – A Hands-On GISPipeline</p>
+<p>unlocksthe Potential of BudgetRemote</p>
+<p>Sensing. In <em>Proceedings of the 24th</em> <em>GIS</em></p>
+<p><em>Research</em> <em>UK Annual</em> <em>Conference</em> ,</p>
+<p><em>GISRUK16</em> , University ofGreenwich,</p>
+<p>30thMarch to 1st April 2016, London, UK.</p>
+</div>
+<div id="spatial-is-special-aggregationsabhängigkeit" class="section level1">
+<h1>Spatial is special: Aggregationsabhängigkeit</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2022.png" /></p>
+<p>Die Wahl der <strong>Aggregationsebene</strong> verändert die Daten und damit die räumlichen Muster</p>
+<p>Bsp. hierZonierung in Kantone oder kleinereArbeitsmarktregionen</p>
+<p>sog. <em>M</em> odifiable <em>A</em> real <em>U</em> nit <em>P</em> roblem (MAUP)</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2023.png" /></p>
+<p>Bildquelle: <a href="https://www.bfs.admin.ch" class="uri">https://www.bfs.admin.ch</a></p>
+</div>
+<div id="spatial-is-special-nachbarschaftsabhängigkeit" class="section level1">
+<h1>Spatial is special: Nachbarschaftsabhängigkeit</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2024.jpg" /></p>
+<ul>
+<li>Räumlich Phänomene zeigen oft gleichzeitig
+<ul>
+<li><strong>Räumliche Autokorrelation:</strong> Was nahe ist hat sehr ähnliche Werte</li>
+<li><strong>Räumliche Heterogenität:</strong> Grosse Unterschiede auf kleinstem Raum</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2025.png" /></p>
+<p>Bildquellen: <a href="https://www.bfs.admin.ch" class="uri">https://www.bfs.admin.ch</a>, <a href="https://mindblog.dericbownds.net/2007/10/rich-and-poor.html" class="uri">https://mindblog.dericbownds.net/2007/10/rich-and-poor.html</a></p>
+</div>
+<div id="special-is-special" class="section level1">
+<h1>Special is Special</h1>
+<ul>
+<li>Grundannahme der Statistik (Daten/Stichproben sind <strong>unabhängig</strong> ) gilt bei räumlichen Daten nicht!</li>
+<li>Räumliche Daten zeigen
+<ul>
+<li><strong>Massstabsabhängigkeit</strong></li>
+<li><strong>Aggregationsabhängigkeit</strong></li>
+<li><strong>Nachbarschaftsabhängigkeit</strong>
+<ul>
+<li>Räumliche Autokorrelation</li>
+<li>Räumliche Heterogenität</li>
+</ul></li>
+</ul></li>
+<li><span style="color:#FF0000">Technische Herausforderung: Umgang mit</span> <span style="color:#FF0000">Geodaten</span> <span style="color:#FF0000">ist schwieriger</span></li>
+<li><span style="color:#00B050">d</span> <span style="color:#00B050">afür riesiges Potenzial für besseres Verständnis unsere natürlichen/gebauten Umwelt, wichtig für Umweltwissenschaften</span></li>
+<li>wir brauchen spezielle Methoden und Werkzeuge, um mit räumlichen Daten umgehen zu können
+<ul>
+<li>Geographische Informationssysteme GIS (nicht in diesem Kurs, aber <strong>sehr</strong> spannend)</li>
+<li>Spezielle Werkzeuge in R, aufbauend auf was Ihr schon könnt</li>
+</ul></li>
+</ul>
+</div>
+<div id="programm-1" class="section level1">
+<h1>Programm</h1>
+<p>“What is special about spatial?”</p>
+<p><strong>Das</strong> <strong>ganz</strong> <strong>kleine</strong> <strong>Geodaten</strong> <strong>Einmaleins</strong> <span style="color:#C00000"> <strong>1x1</strong> </span></p>
+<p>RäumlicheAnnotation vonPunktdaten(Spatial Join)</p>
+<p>NachbarschaftundNähe(Puffer)</p>
+<p>RäumlicheAggregation (MAUP)</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2026.jpg" /></p>
+</div>
+<div id="für-eine-geodatenanalyse-brauche-ichgis-101" class="section level1">
+<h1>Für eine Geodatenanalyse brauche ich…(GIS 101)</h1>
+<ul>
+<li>Ein <strong>Modell</strong> zur Abbildung der Umwelt
+<ul>
+<li>Konzeptionelle Datenmodelle</li>
+<li><strong>Entitäten</strong> (entities)oder <strong>Felder</strong> (fields)</li>
+</ul></li>
+<li><strong>Datenstrukturen</strong> zur Speicherung der Lage und Attribute
+<ul>
+<li>Vektor (Punkte, Linien, Polygone) oder Raster</li>
+<li>vgl. zu den R Datentypencharacter,numeric,vector, nur halt fürGeodatenmit Geometrie/Lageinformation</li>
+<li>mit einem Koordinatensystemen (WGS84, CH1903+ LV95)</li>
+</ul></li>
+<li>Räumliche <strong>Beziehungen</strong> für die Analyse
+<ul>
+<li>Geometrie (x,y,z),</li>
+<li>Topologie (räumliche Beziehungen zwischen Objekten)</li>
+</ul></li>
+</ul>
+</div>
+<div id="konzeptionelle-raummodelle" class="section level1">
+<h1>1. Konzeptionelle Raummodelle</h1>
+<p>Geodatenmüssenin irgendeiner Form <strong>Attribute</strong> (die <strong>Semantik</strong> <strong>1</strong> ) und <strong>räumliche Information</strong> über die zu beschreibenden Dinge berücksichtigen, …</p>
+<p>…mit anderen Worten, das <strong>“was”</strong> und <strong>“wo”</strong> abdecken</p>
+<p>sowohlAttribute als auch Lageinformation können auf unterschiedliche Art und Weise beschriebenwerden</p>
+<p>Kt. GR</p>
+<p>Fläche: 7105 km²</p>
+<p>Einw. 198000</p>
+<p>#Besch. Tour. 12360</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2027.png" /></p>
+<ul>
+<li><strong>Entitäts-Modell (engl.</strong> <em>entities</em> <strong>):</strong> Der Raum ist bevölkert mit diskreten Objekten mit einer Lage und Attributen ( <strong>Entitäten</strong> oder Objekte)</li>
+<li><strong>Feld-Modell (engl.</strong> <em>fields</em> <strong>):</strong> Die zu untersuchende räumliche Eigenheit hat eine kontinuierliche räumliche Existenz, d.h. jeder Punkt im Raum hat einen Wert</li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2028.png" /></p>
+<p>Semantik(vonaltgriechischσημαίνειν sēmaínein „bezeichnen“): allg.Lehrevon</p>
+<p>BedeutungderZeichen, inGISderBedeutungszusammenhangdessenwasmodelliertwird</p>
+</div>
+<div id="datenstrukturen-vektor-oder-raster" class="section level1">
+<h1>2. Datenstrukturen: Vektor oder Raster?</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2029.png" /></p>
+<p><span style="color:#000000"> <strong>Konzeptionelles</strong> </span> <span style="color:#000000"> <strong>Datenmodell</strong> </span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2030.png" /></p>
+</div>
+<div id="vektor-datenstruktur" class="section level1">
+<h1>Vektor-Datenstruktur</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2031.png" /></p>
+<p>Bildquelle: Heywood, I. et al. (2006). An Introduction to Geographical Information Systems, Pearson.</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2032.png" /></p>
+</div>
+<div id="koordinatensysteme" class="section level1">
+<h1>Koordinatensysteme</h1>
+<p>Karthesische</p>
+<p>Koordinatensysteme</p>
+<p>Geodätische</p>
+<p>Koordinatensysteme</p>
+<p>MitProjektion</p>
+<p>X- und Y-Achse rechtwinklig,planar(daherkarthesisch)</p>
+<p>CH1903 LV03altes SchweizerLandeskoordinatensyst(03 steht für 1903!)</p>
+<p>CH1903+ LV95neues Schweizer Landeskoordinatensystem (seit 2017)</p>
+<p>globale Koordinatensysteme in Länge und Breite</p>
+<p>Lat/Lon</p>
+<p>nicht rechtwinklig</p>
+<p>z.B.WGS84(WorldGeodeticSystem)</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2033.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2034.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2035.png" /></p>
+<p><a href="https://www.ibm.com/support/knowledgecenter" class="uri">https://www.ibm.com/support/knowledgecenter</a></p>
+<p><a href="https://www.swisstopo.admin.ch/de/wissen-fakten/geodaesie-vermessung" class="uri">https://www.swisstopo.admin.ch/de/wissen-fakten/geodaesie-vermessung</a></p>
+<p>SCHERTENLEIB, M. H., BURRI K., ROHR U., 1998: Geografie II, Lektion 2, Inhalt: Kartografie, AKAD Verlag, Zürich, Stuttgart</p>
+</div>
+<div id="zusammenfassung" class="section level1">
+<h1>Zusammenfassung</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2036.png" /></p>
+<p>Räumliche Daten sind speziell weil sie <strong>massstabsabhängig</strong> (Notwenigkeit der Angabe eines Massstabs), <strong>aggregationsabhängig</strong> (Variation der Daten je nach Aggregation/Zonierung) und <strong>nachbarschaftsabhängig</strong> sind (räumliche Abhängigkeit neben räumlicher Heterogenität).</p>
+<p>Die Grundannahmeder <strong>Unabhängigkeit</strong> von Stichproben giltnicht für räumliche Daten, deshalb braucht es eigene Methoden für die Raumanalyse.</p>
+<p>Diezwei gebräuchlichsten <strong>konzeptuellen Datenmodelle</strong> für räumliche Phänomene sind Entitäten (diskrete Objekte) und Felder (kontinuierlich).</p>
+<p>Entitätenund Felder werden in GIS meist mit den <strong>Datenstrukturen</strong> Vektor(für Entitäten) und Raster (für Felder)repräsentiert</p>
+<p>Methoden-Modul</p>
+<p>MScUmwelt und NatürlicheRessourcen</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2037.png" /></p>
+<p><span style="color:#D30000">Screencast</span></p>
+<p><span style="color:#D30000">Teil 2</span></p>
+</div>
+<div id="spatial-data-science-1-1" class="section level1">
+<h1>Spatial Data Science 1</h1>
+</div>
+<div id="patrick-laube-nils-ratnaweera-nikos-bakogiannis-1" class="section level1">
+<h1>Patrick Laube, Nils Ratnaweera &amp; Nikos Bakogiannis</h1>
+<p>Geoinformatics Research Group</p>
+<p>Institute of Natural Resource Sciences<br />
+ZHAW Zurich University of Applied Sciences Grüental, Postfach, CH-8820 Wädenswil</p>
+<p>{laup, rata, <a href="mailto:bako%7D@zhaw.ch" class="email">bako}@zhaw.ch</a></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2038.jpg" /></p>
+</div>
+<div id="programm-2" class="section level1">
+<h1>Programm</h1>
+<p>“What is special about spatial?”</p>
+<p>DasganzkleineGeodatenEinmaleins</p>
+<p><strong>Räumliche</strong> <strong>Annotation von</strong> <strong>Punktdaten</strong> <strong>(Spatial Join)</strong></p>
+<p>NachbarschaftundNähe(Puffer)</p>
+<p>RäumlicheAggregation (MAUP)</p>
+</div>
+<div id="convenience-variablen" class="section level1">
+<h1>Convenience Variablen</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2039.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2040.png" /></p>
+</div>
+<div id="frage-räumliche-einbettung-der-sensoren" class="section level1">
+<h1>Frage: Räumliche Einbettung der Sensoren?</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2041.png" /></p>
+<p>Überlege Dir,wie wir solche Sensoren räumlich einbetten könnten?</p>
+<p>Wie könnten wir die Tabelle mit zusätzlichen räumlichen Attributen erweitern?</p>
+<p>min</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2042.gif" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2043.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2044.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2045.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2046.png" /></p>
+</div>
+<div id="räumliche-variablen-attribut-join" class="section level1">
+<h1>Räumliche Variablen: Attribut-Join</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2047.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2048.png" /></p>
+<ul>
+<li><p>Sensoren Lage-Code</p></li>
+<li><p>(räuml. Attribut)</p>
+<ul>
+<li>10=tief</li>
+<li>20=hoch</li>
+</ul></li>
+<li><p>Joinmit Tabelle Gelände</p></li>
+<li><p>Sensoren Lage-Code</p></li>
+<li><p>(räuml. Attribut)</p>
+<ul>
+<li>10=tief</li>
+<li>20=hoch</li>
+</ul></li>
+<li><p>Joinmit Tabelle Gelände</p></li>
+</ul>
+<p>group_by()</p>
+<p>summarize()</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2049.png" /></p>
+</div>
+<div id="räumliche-variablen-spatial-join" class="section level1">
+<h1>Räumliche Variablen: Spatial-Join</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2050.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2051.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2052.png" /></p>
+<p>SenKontext&lt;-st_join(sensoren,flaechentyp)</p>
+</div>
+<div id="räumliche-beziehungen-topologie" class="section level1">
+<h1>3. Räumliche Beziehungen: Topologie</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2053.png" /></p>
+<ul>
+<li>Topologische Beziehungen beschreiben dierelativenräumlichen Beziehungen von Objekten zueinander, wobei von der Geometrie abstrahiert wird. Somit ergänzt die Topologie die Positionsdaten und Formbeschreibungen aus derGeometriedurch (b)Nachbarschaftsaussagen</li>
+<li><em>(Bill, 2010)</em></li>
+<li>Topologie
+<ul>
+<li>overlaps (dt.überlappend)</li>
+<li>touch (dt.berührend)</li>
+<li>contains (dt.enthalten)</li>
+<li>(vgl. spatial join)</li>
+<li>intersects (dt.schneiden)</li>
+</ul></li>
+</ul>
+</div>
+<div id="point-in-polygon-test" class="section level1">
+<h1>Point-in-Polygon Test</h1>
+<ul>
+<li>Point-in-polygon Test. Bsp. für räumliche Algorithmen
+<ul>
+<li>Wie oft schneidet ein Strahl von Punkt P das Polygon?
+<ul>
+<li>ungerade: drin</li>
+<li>gerade: draussen</li>
+</ul></li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2054.jpg" /></p>
+<p><a href="http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html" class="uri">http://idav.ucdavis.edu/~okreylos/TAship/Spring2000/PointInPolygon.html</a></p>
+</div>
+<div id="topologie-für-konnektivität" class="section level1">
+<h1>Topologie für Konnektivität</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2055.png" /></p>
+<ul>
+<li>WasistübereinNetzwerkmitwasverbunden?
+<ul>
+<li>KürzesterPfadvon AnachB?</li>
+<li>WasserflussdurchsGewässernetz</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2056.png" /></p>
+<p><a href="http://www.google.ch" class="uri">http://www.google.ch</a></p>
+<p><a href="http://www.swisstopo.admin.ch/internet/swisstopo/de/home/products/landscape/vector200.html" class="uri">http://www.swisstopo.admin.ch/internet/swisstopo/de/home/products/landscape/vector200.html</a></p>
+</div>
+<div id="programm-3" class="section level1">
+<h1>Programm</h1>
+<p>“What is special about spatial?”</p>
+<p>DasganzkleineGeodatenEinmaleins</p>
+<p>RäumlicheAnnotation vonPunktdaten(Spatial Join)</p>
+<p><strong>Nachbarschaft</strong> <strong>und</strong> <strong>Nähe</strong> <strong>(Puffer)</strong></p>
+<p>RäumlicheAggregation (MAUP)</p>
+</div>
+<div id="räumliche-analysen-mit-räumlichen-beziehungen" class="section level1">
+<h1>Räumliche Analysen mit räumlichen Beziehungen</h1>
+<ul>
+<li>«Wädenswil liegt im Kanton Zürich.»
+<ul>
+<li><strong>Spatial</strong> <strong>join</strong></li>
+<li>topologische Beziehung <em>contains</em></li>
+</ul></li>
+<li>«Wädenswil ist ein Nachbarort von Horgen.»
+<ul>
+<li><strong>Nachbarschaftsbeziehung</strong></li>
+<li>topologische Beziehung <em>touch</em></li>
+</ul></li>
+<li>«Wädenswil ist in der Nähe von Männedorf.»
+<ul>
+<li><strong>Nähe</strong> (engl.proximity)</li>
+<li>Wie modellieren wir «in der Nähe»?</li>
+<li>Puffer</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2057.png" /></p>
+</div>
+<div id="nähe-puffer" class="section level1">
+<h1>Nähe: Puffer</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2058.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2059.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2060.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2061.png" /></p>
+</div>
+<div id="übungen" class="section level1">
+<h1>Übungen</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2062.png" /></p>
+<p>SpatialJoinmit Punktdaten zur Wasserverfügbarkeit und Rasterdaten zu Skeletanteil im Boden</p>
+<p>Frage: Wieso hat Schweiz so seltsame Form?</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2063.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2064.png" /></p>
+</div>
+<div id="nähe-puffertypen" class="section level1">
+<h1>Nähe: Puffertypen</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2065.gif" /></p>
+<p>Punkt-Puffer</p>
+<p>Linien-Puffer</p>
+<p>Flächen-Puffer</p>
+<p>hier auf Rasterdaten, nicht Vektordaten</p>
+<p>% graue Zellen im Puffer</p>
+</div>
+<div id="puffer-aufgabe-in-den-übungen" class="section level1">
+<h1>Puffer-Aufgabe in den Übungen</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2066.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2067.gif" /></p>
+<p>Sen106 liegt selbst auf der Kategorie «weiss», ist aber zu 85% von «grau» umgeben.</p>
+<p>Bestimme im Puffer den häufigsten Zellenwert = Modus (weiss oder grau) in der Nachbarschaft von Sen106</p>
+<p>für Sen106 ist Modus grau</p>
+</div>
+<div id="aus-unseren-projekten-astra-wildtierunfälle" class="section level1">
+<h1>Aus unseren Projekten: ASTRA Wildtierunfälle</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2068.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2069.png" /></p>
+<ul>
+<li><strong>Vektordaten</strong>
+<ul>
+<li>Anzahl Quellen in der Nähe der Strasse</li>
+<li>Länge der Flüsse in der Nähe der Strasse</li>
+<li>Waldfläche in der Nähe der Strasse</li>
+</ul></li>
+<li><strong>Rasterdaten</strong>
+<ul>
+<li>Max. Lärmbelastung in der Nähe</li>
+<li>Anteil Wald (nun Raster)</li>
+</ul></li>
+<li><strong>Leitstrukturen</strong>
+<ul>
+<li>leiten Wild auf die Strasse hin</li>
+<li>Hydrologische Modellierung</li>
+<li>2 Puffer-Modell</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2070.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2071.png" /></p>
+</div>
+<div id="zusammenfassung-1" class="section level1">
+<h1>Zusammenfassung</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2072.png" /></p>
+<p>Ein <strong>spatial</strong> <strong>join</strong> basiert auf der topologischen Beziehungcontainsund erlaubt dieAnnotation von Punkten mit räumlichen Attributen.</p>
+<p><strong>Topologische Beziehungen</strong> beschreiben die relativen räumlichen Beziehungen von Objekten zueinander, wobei von der Geometrie abstrahiertwird (z.B.contain/beinhalten, Punkt in Polygon).</p>
+<p><strong>Pufferoperationen</strong> erlauben die Erfassung von Nachbarschaftsbeziehungen von Punkten, Linien und Polygonen.</p>
+<p>Methoden-Modul</p>
+<p>MScUmwelt und NatürlicheRessourcen</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2073.png" /></p>
+</div>
+<div id="spatial-data-science-1-2" class="section level1">
+<h1>Spatial Data Science 1</h1>
+<p><span style="color:#D30000">Screencast</span></p>
+<p><span style="color:#D30000">Teil 3</span></p>
+</div>
+<div id="patrick-laube-nils-ratnaweera-nikos-bakogiannis-2" class="section level1">
+<h1>Patrick Laube, Nils Ratnaweera &amp; Nikos Bakogiannis</h1>
+<p>Geoinformatics Research Group</p>
+<p>Institute of Natural Resource Sciences<br />
+ZHAW Zurich University of Applied Sciences Grüental, Postfach, CH-8820 Wädenswil</p>
+<p>{laup, rata, <a href="mailto:bako%7D@zhaw.ch" class="email">bako}@zhaw.ch</a></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2074.jpg" /></p>
+</div>
+<div id="programm-4" class="section level1">
+<h1>Programm</h1>
+<p>“What is special about spatial?”</p>
+<p>DasganzkleineGeodatenEinmaleins</p>
+<p>RäumlicheAnnotation vonPunktdaten(Spatial Join)</p>
+<p>NachbarschaftundNähe(Puffer)</p>
+<p><strong>Räumliche</strong> <strong>Aggregation (MAUP)</strong></p>
+</div>
+<div id="aggregationsabhängigkeit" class="section level1">
+<h1>Aggregationsabhängigkeit</h1>
+<p>Oft mussmitaggregiertenDatengearbeitetwerden,z.B.ausDatenschutz-gründen,weildieDatennuraggregierterhobenwurden,ausGründenderVergleichbarkeitusw.</p>
+<p>sog. <strong>Choroplethen-Karte</strong> (Flächenwertstufenkarte),ausχῶρος“Fläche/Region” and πλῆθος“Vielfaches”)</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2075.png" /></p>
+<p>Quelle: Atlas derSchweizInteraktiv, Version 1.</p>
+</div>
+<div id="hierarchische-aggregation-von-raumeinheiten" class="section level1">
+<h1>Hierarchische Aggregation von Raumeinheiten</h1>
+<p><span style="color:#000000">Prozent</span> <span style="color:#000000">Nutzung</span> <span style="color:#000000">ÖV –</span> <span style="color:#000000">Niveau</span> <span style="color:#FF0000">Kanton</span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2076.png" /></p>
+<p>Quelle: Atlas derSchweizInteraktiv, Version 1.</p>
+<p><span style="color:#000000">Prozent</span> <span style="color:#000000">Nutzung</span> <span style="color:#000000">ÖV –</span> <span style="color:#000000">Niveau</span> <span style="color:#FF0000">Bezirk</span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2077.png" /></p>
+<p>Quelle: Atlas derSchweizInteraktiv, Version 1.</p>
+<p><span style="color:#000000">Prozent</span> <span style="color:#000000">Nutzung</span> <span style="color:#000000">ÖV –</span> <span style="color:#000000">Niveau</span> <span style="color:#FF0000">Gemeinde</span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2078.png" /></p>
+<p>Quelle: Atlas derSchweizInteraktiv, Version 1.</p>
+</div>
+<div id="maup-ein-spezifisch-geographisches-phänomen" class="section level1">
+<h1>MAUP: Ein spezifisch geographisches Phänomen</h1>
+<ul>
+<li><strong>Beobachtungen bei Untersuchungen mit aggregierten Daten:</strong></li>
+<li>Je nach Wahl der Raumeinheit ergeben sich andere Werte für das/die untersuchte(n) Merkmal(e).</li>
+<li>Durch Veränderung der Raumeinheiten (d.h. durch verschiedenartige Aggregation) können teilweise sehr unterschiedliche Resultate entstehen.</li>
+<li>Beispiele (siehe folgende Folien):
+<ul>
+<li>hierarchische Aggregation von Raumeinheiten: Gemeinden, Bezirke, Kantone</li>
+<li>Bildung verschiedener Grenzziehungen bei gegebener Zahl von Einheiten</li>
+</ul></li>
+<li>Fragen:
+<ul>
+<li>Welches ist das ‘richtige’ Aggregationsniveau (= Massstab)?</li>
+<li>Welche Raumeinheiten sollen zusammengefasst werden?</li>
+</ul></li>
+</ul>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2079.png" /></p>
+<p>Quelle:O’SULLIVAN, D. and UNWIN, D.J. (2010): <em>Geographic Information Analysis</em> . Hoboken, NJ: Wiley,p. 36ff.</p>
+</div>
+<div id="kombinatorische-explosion-bei-zonierung" class="section level1">
+<h1>Kombinatorische Explosion bei Zonierung</h1>
+<p>DieZahlmöglicherGrenzziehun-gen (=Zonierungen)fürdie Aggregation vonRaumeinheitenexplodiertsehrschnell,wiedasnebenstehendeBeispielschonfürkleineZahlenzeigt.</p>
+<p>EssindhiernureinigederMöglichkeitenderZonierunggezeigt.</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2080.png" /></p>
+<p>Quelle: The Modifiable Areal Unit Problem. CATMOG (Concepts and Techniques in Modern Geography), Vol. 38, Norwich: Geo Books.DerKlassikerzumThemaMAUP (40Seiten).</p>
+</div>
+<div id="weitere-beobachtungen" class="section level1">
+<h1>Weitere Beobachtungen</h1>
+<ul>
+<li>Es gibt <strong>kein vorhersehbares Verhalten</strong> der Werte bei Aggregation und dadurch keine systematische Korrekturmöglichkeit. Beispiel Mittelwerte:
+<ul>
+<li>sie können durch die Aggregation ansteigen</li>
+<li>sie können aber auch kleiner werden</li>
+</ul></li>
+<li>Würden die Raumeinheiten bei gleicher Zahl mit anderen Grenzziehungen anders gebildet, dann ergäben sich völlig unterschiedliche Werte.</li>
+<li>Dies kann sogar ausgenutzt werden (und wird in der Politik durchaus ausgenutzt), um manipulativ für eine Interessengruppe vorteilhafte Raumeinheiten zu bilden (engl. gerrymandering):
+<ul>
+<li>Beispiel: Wahlbezirke ‘optimiert’ für die Regierungspartei (v.a. beliebt bei Mehrheitswahlrecht)</li>
+<li>Beispiel: Manipulation der Grenzziehung von Regionen in einer Weise, dass maximale Unterstützungsbeiträge fällig werden (Subventionen).</li>
+</ul></li>
+</ul>
+</div>
+<div id="fun-facts-1-gerrymandering" class="section level1">
+<h1>Fun Facts 1: gerrymandering</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2081.jpg" /></p>
+<p><a href="http://en.wikipedia.org/wiki/Gerrymandering" class="uri">http://en.wikipedia.org/wiki/Gerrymandering</a></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2082.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2083.png" /></p>
+<p><a href="https://www.washingtonpost.com/news/wonk/wp/2016/10/28/how-to-gerrymander-your-way-to-a-huge-election-victory/" class="uri">https://www.washingtonpost.com/news/wonk/wp/2016/10/28/how-to-gerrymander-your-way-to-a-huge-election-victory/</a></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2084.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2085.png" /></p>
+<p>Quelle:<a href="http://en.wikipedia.org/wiki/File:Illinois_District_4_2004.png" class="uri">http://en.wikipedia.org/wiki/File:Illinois_District_4_2004.png</a></p>
+</div>
+<div id="fun-facts-2-how-to-lie-with-maps" class="section level1">
+<h1>Fun Facts 2: How to lie with maps</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2086.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2087.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2088.png" /></p>
+<p>Oben: Dr. John Snow’s Karte des Cholera-Ausbruchs im Gebiet um die Broad Street in London, 1854. (Vorlesung 1)</p>
+<p>Aufgrund der Häufungen der Cholerafälle (kleine Punkte) wurde die Wasserpumpe an der Broad Street als Quelle identifiziert.</p>
+<p>Von den drei verschiedenen Aggregationen im unteren Bild gibt aber nur die erste diesen Sachverhalt wieder. Die anderen Aggregationen führen zu Fehlschlüssen.</p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2089.jpg" /></p>
+<p>Quelle:Monmonier, M.S. (1991): <em>How</em> <em>to</em> <em>Lie</em> <em>with</em> <em>Maps</em> . Chicago: Chicago University Press.</p>
+<p><a href="https://anotherheader.files.wordpress.com/2017/03/dsc_2886-edit-edit.jpg?w=1024&amp;h=683" class="uri">https://anotherheader.files.wordpress.com/2017/03/dsc_2886-edit-edit.jpg?w=1024&amp;h=683</a></p>
+</div>
+<div id="übungen-1" class="section level1">
+<h1>Übungen</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2090.png" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2091.png" /></p>
+<p>Choroplethenkartenaus Punktmessungen zur Wasserverfügbarkeit</p>
+<p>MAUPKt.vs.Bez.</p>
+</div>
+<div id="maup-definition" class="section level1">
+<h1>MAUP: Definition</h1>
+<ul>
+<li>Heywood et al. (2006) definieren das Modifiable Areal Unit Problem (MAUP) wie folgt:</li>
+<li>Das MAUP besteht aus zwei Teilproblemen:
+<ul>
+<li><em>Skalenproblem / Massstabsproblem</em> : Raumeinheiten sind oft beliebig und aggregieren verortete Daten anders je nach Skala. — Welches ist die richtige Skala (Massstab) für die Untersuchung eines gegebenen Sachverhalts (Individuum, Haushalt, Gemeinde, Bezirk, Kanton, …) ?</li>
+<li><em>Aggregationsproblem</em> : Es existieren viele mögliche Varianten der Zonenbildung (und damit der Aggregation) auf einer Skalenstufe. — Welches ist die richtige für die Untersuchung eines gegebenen Sachverhalts?</li>
+</ul></li>
+</ul>
+<p><span style="color:#000000">„A problem arising from the imposition of artificial units of spatial reporting on continuous geographic phenomena resulting in the generation of artificial spatial patterns.“ (p. 416)</span></p>
+</div>
+<div id="empfehlungen-und-lösungsansätze" class="section level1">
+<h1>Empfehlungen und Lösungsansätze</h1>
+<ul>
+<li>DieMissachtung des Problems kann hingegen zu <strong>Fehlschlüssen</strong> und <strong>Scheinkorrelationen</strong> führen.</li>
+<li>Ansätze zur Lösung des Problems müssen zwingend die geographische Natur des untersuchten Phänomens einbeziehen.</li>
+<li><strong>Zonierungen</strong> und aggregierte Daten <strong>nicht unbesehen übernehmen</strong> . Raumeinheiten hinterfragen: Entspricht die Skala und die Aggregation dem zu untersuchendenSachverhalt?</li>
+<li>Erhaltene Resultate bezüglich statistischer Fehler und Aussagekraft beurteilen, <strong>sowie alternative Zonierungen</strong> und Aggregationen generieren und <strong>vergleichen</strong> :
+<ul>
+<li>Entstehen <strong>unterschiedliche Resultate</strong> ? Wiegrosssind diese Unterschiede und wo treten sie auf?</li>
+<li>Welche Zonierung/Aggregation liefert vom geographischen Standpunkt aus plausible Resultate?</li>
+</ul></li>
+</ul>
+</div>
+<div id="zusammenfassung-2" class="section level1">
+<h1>Zusammenfassung</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2092.png" /></p>
+<p>Das <strong>Modifiable</strong> <strong>Areal Unit Problem (MAUP)</strong> tritt auf, wenn künstliche Raumunterteilungen an sich kontinuierliche geographische Phänomeneaggregieren. DasMAUP kann zu Artefakten, Trugschlüssen und Fehlinterpretationen führen.</p>
+</div>
+<div id="zusätzliche-lektüre" class="section level1">
+<h1>Zusätzliche Lektüre</h1>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2093.png" /></p>
+<p><span style="color:#000000">O’SULLIVAN</span> <span style="color:#000000">, D. and UNWIN, D.J. (</span> <span style="color:#000000">2010)</span> <span style="color:#000000">:</span> <span style="color:#000000"> <em>Geographic Information Analysis</em> </span> <span style="color:#000000">.</span> <span style="color:#000000">2</span> <span style="color:#000000">nd</span> <span style="color:#000000">Ed, Hoboken</span> <span style="color:#000000">, NJ: Wiley.</span> <span style="color:#000000"> <strong>Kapitel</strong> </span> <span style="color:#000000"> <strong>2</strong> </span> <span style="color:#000000">,</span> <span style="color:#000000">p.33ff</span></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2094.jpg" /></p>
+<p><img src="img/MSc_UNR_SpatDataScience1_HS2095.png" /></p>
+</div>
+<div id="klassiker-zur-vorlesung" class="section level1">
+<h1>Klassiker zur Vorlesung</h1>
+<p>Longley, P. A.,Goodchild, M. F.,Maguire, D.J.andRhind, D.W. (2005): <em>Geographic</em> <em>Information Systems</em> <em>and</em> <em>Science</em> . 2nd Edition. JohnWiley.</p>
+<p>Monmonier, M.S. (1991): <em>How</em> <em>to</em> <em>Lie</em> <em>with</em> <em>Maps</em> . Chicago: Chicago University Press.Ein sehr lesenswertes und witziges Büchlein, das zeigt, wie man Karten nicht machen sollte.</p>
+<p>Openshaw, S. (1984): TheModifiableAreal Unit Problem. <em>CATMOG (</em> <em>Concepts</em> <em>and</em> <em>Techniques</em> <em>in Modern</em> <em>Geography</em> <em>)</em> , Vol. <strong>38</strong> , Norwich:GeoBooks.Der Klassiker zum Thema MAUP (40 Seiten).</p>
+<p>Tobler, W. R. (1970). AcomputermodelsimulationofurbangrowthintheDetroitregion. <em>Economic</em> <em>Geography</em> , <strong>46</strong> (2): 234-240.</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.odd').parent('tbody').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open');
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

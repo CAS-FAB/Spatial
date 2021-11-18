@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Übung 3: Einfache Rasterdaten</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nils Ratnaweera" />
+    <meta name="date" content="2021-11-18" />
+    <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="site_libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="site_libs/shareon-1.4.1/shareon.min.css" rel="stylesheet" />
+    <script src="site_libs/shareon-1.4.1/shareon.min.js"></script>
+    <link href="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.js"></script>
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Übung 3: Einfache Rasterdaten
+## CAS FAB: Räumliche Daten in R
+### Nils Ratnaweera
+### Forschungsgruppe Geoinformatik
+### 2021-11-18
+
+---
+
+<style>.shareagain-bar {
+--shareagain-foreground: rgb(255, 255, 255);
+--shareagain-background: rgba(0, 0, 0, 0.5);
+--shareagain-twitter: none;
+--shareagain-facebook: none;
+--shareagain-linkedin: none;
+--shareagain-pinterest: none;
+--shareagain-pocket: none;
+--shareagain-reddit: none;
+}</style>
+
+
+## Vorbereitung &lt;!--2--&gt;
+
+Installiere zudem das R Package `terra`
+
+Erstelle dann ein neues R Script mit dem Namen `Uebung_3.R` und lade darin die libraries `sf` sowie `tmap`.
+
+
+
+
+
+```r
+library(sf)
+library(tmap)
+```
+
+---
+
+## Übung 3.1 &lt;!--10--&gt;
+
+- Such das digitale höhenmodell der Schweiz. 
+- Auch hier kannst du die folgenden Adressen nutzen:
+  - [opendata.swiss](https://opendata.swiss/)
+  - [map.geo.admin.ch](https://map.geo.admin.ch)
+  - [swisstopo.admin.ch](https://www.swisstopo.admin.ch)
+- Entzippe das File (sofern nötig) und schau dir den Inhalt an
+
+--
+
+## Lösung
+
+https://www.swisstopo.admin.ch/de/geodata/height/dhm25200.html
+
+Shortlink (für diesen Kurs): https://bit.ly/3Hj4X0K
+
+
+---
+layout: true
+
+## Input: Raster Datenformate
+
+---
+
+Inhalt des heruntergeladenen zip-Files:
+
+.pull-left[
+### Eigentliche Daten:
+- DHM200_polyface.dxf
+- DHM200.asc
+- DHM200.xyz
+]
+
+.pull-right[
+### Metadaten und Lizenzbedigungen:
+- license.txt
+- Metadata_gm03.xml
+- Metadata_PDF.pdf
+- Metadata_xml_iso19139.xml
+]
+
+---
+
+Der gleiche Datensatz (`DHM25 200`) in 3 unterschiedlichen Datenformaten:
+
+- ~~DHM200_polyface.dxf~~
+- DHM200.asc
+- DHM200.xyz
+
+???
+
+- 3x die gleichen Daten!
+- dxf wird eher im CAD bereich verwendet, dieses werden wir ignorieren (könnt ihr löschen)
+
+
+---
+
+## ESRI ArcInfo ASCII Grid
+
+- Dateierweiterung \*.asc
+- ein Datenformat von ESRI (siehe die [Spezifikationen](http://old.geotools.org/ArcInfo-ASCII-Grid-format_5250.html))
+- beginnt mit mehreren Zeilen Metaadaten, darauf folgen die eigentlichen Werte
+- kann in einem Texteditor geöffnet werden:
+
+```{}
+NCOLS 1926
+NROWS 1201
+XLLCORNER 479900.
+YLLCORNER 61900.
+CELLSIZE 200.
+NODATA_VALUE -9999.
+-9999. -9999. -9999. -9999. -9999. -9999. -9999. -9999. -9999. -9999. -9999. -9999. 
+...
+...
+...
+835.415 863.55 887.424 869.213 855.539 845.878 829.714 815.258 807.458 799.816 799.2  
+```
+
+---
+
+## ASCII Gridded XYZ 
+
+- Dateierweiterung \*.xyz
+- Ein offenes Format
+- Beinhaltet 3 Spalten: x- und y- Koordinaten sowie Zellwert
+- kann in einem Texteditor geöffnet werden:
+
+```{}
+655000.00 302000.00 835.01
+655200.00 302000.00 833.11
+655400.00 302000.00 831.20
+```
+
+---
+
+Um Rasterdaten in R zu importieren verwenden wir das Package `terra`.
+
+
+```r
+install.packages("terra")
+```
+
+
+
+```r
+library(terra)
+```
+
+```
+## terra version 1.3.22
+```
+
+```r
+dhm200 &lt;- rast("_data/dhm25_200/DHM200.xyz")
+```
+
+- Aus `terra` benötigen wir die Funktion `rast`
+- das Importieren funktioniert gleich, unabhängig von der Dateierweiterung
+- eine summarische Zusammenfassung erhält man via Konsole:
+
+
+```r
+dhm200
+```
+
+
+---
+
+
+```r
+dhm200
+```
+
+```
+## class       : SpatRaster 
+## dimensions  : 1141, 1926, 1  (nrow, ncol, nlyr)
+## resolution  : 200, 200  (x, y)
+## extent      : 479900, 865100, 73900, 302100  (xmin, xmax, ymin, ymax)
+*## coord. ref. :  
+## source      : DHM200.xyz 
+## name        :  DHM200 
+## min value   :     193 
+## max value   : 4556.63
+```
+
+---
+
+Eine einfache Visualisierung erhält man mit dem `plot()` Befehl:
+
+
+```r
+plot(dhm200)
+```
+
+![](05_Uebung_3_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+
+
+---
+layout: false
+
+## Übung 3.2 &lt;!--3--&gt;
+
+In welchem Koordinatensystem befindet sich dieses Höhenmodell? 
+
+Tipp: Konsultiere die Metadaten!
+
+--
+
+## Lösung
+
+![](images/ref.png)
+
+&amp;rarr; im alten Schweizer Koordinatensystem CH1903 LV03
+---
+
+## Übung 3.2 &lt;!--3--&gt;
+
+Wie hoch ist die Auflösung?
+
+--
+
+## Lösung
+
+![](images/res.png)
+
+&amp;rarr; 200 Meter
+
+---
+
+## Übung 3.3 &lt;!--3--&gt;
+
+Importiere `DHM200` in R und schau dir das Objekt in der Konsole sowie mit `plot()` an.
+
+--
+
+## Lösung
+
+
+
+```r
+dhm200 &lt;- rast("_data/dhm25_200/DHM200.xyz")
+dhm200
+plot(dhm200)
+```
+
+---
+layout: true
+## Input: Koordinatenbezugssystem *festlegen*
+
+---
+
+- Das Koordinatenbezugssystem haben wir bereits für Vektordaten festgelegt
+- dabei haben wir folgenden Befehl verwendet: 
+- `st_crs(meinvektordatensatz) &lt;- 21781` &lt;- für das alte Schweizer Koordinatenbezugssystem
+- für Rasterdaten funktioniert es leicht anders:
+
+
+```r
+crs(dhm200) &lt;- "epsg: 21781"
+```
+
+--
+
+- `crs()` statt `st_crs`
+- `"epsg: 21781"` (mit Anführungs- und Schlusszeichen) statt `21781`
+
+---
+
+
+
+```r
+dhm200
+```
+
+```
+## class       : SpatRaster 
+## dimensions  : 1141, 1926, 1  (nrow, ncol, nlyr)
+## resolution  : 200, 200  (x, y)
+## extent      : 479900, 865100, 73900, 302100  (xmin, xmax, ymin, ymax)
+*## coord. ref. : +proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs 
+## source      : DHM200.xyz 
+## name        :  DHM200 
+## min value   :     193 
+## max value   : 4556.63
+```
+
+
+---
+layout: true
+
+## Input: Koordinatenbezugssystem *transformieren*
+
+---
+
+- Das Koordinatenbezugssystem von `dhm200` ist das alte Schweizer Koordinatenbezugssytem (`CH1903 LV03` bzw. `EPSG: 21781`)
+- Analog den Vektordaten sollten wir es in das *neue* Schweizer Koordinatenbezugssytem transformieren
+- Für Vektordaten haben wir dafür den Befehl `st_transform` verwendet
+- Die Analoge Funktion für Rasterdaten lautet `project`
+
+
+```r
+dhm200_2056 &lt;- project(dhm200, "epsg: 2056")
+```
+
+---
+
+
+```r
+dhm200
+```
+
+```
+## class       : SpatRaster 
+## dimensions  : 1141, 1926, 1  (nrow, ncol, nlyr)
+## resolution  : 200, 200  (x, y)
+## extent      : 479900, 865100, 73900, 302100  (xmin, xmax, ymin, ymax)
+*## coord. ref. : +proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=600000 +y_0=200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs 
+## source      : DHM200.xyz 
+## name        :  DHM200 
+## min value   :     193 
+## max value   : 4556.63
+```
+
+
+
+```r
+dhm200_2056
+```
+
+```
+## class       : SpatRaster 
+## dimensions  : 1141, 1926, 1  (nrow, ncol, nlyr)
+## resolution  : 200.0001, 200.0001  (x, y)
+## extent      : 2479899, 2865099, 1073900, 1302100  (xmin, xmax, ymin, ymax)
+*## coord. ref. : +proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs 
+## source      : memory 
+## name        :   DHM200 
+## min value   :      193 
+## max value   : 4556.412
+```
+
+
+---
+layout: false
+
+## Übung 3.4 &lt;!--4--&gt;
+
+Transformiere `dhm200` in das Koordinatenbezugssystem `CH1903 LV95`. Speichere den Output als `dhm200_2056`.
+
+--
+
+## Lösung
+
+
+```r
+dhm200_2056 &lt;- project(dhm200, "epsg: 2056")
+```
+
+
+
+
+---
+
+## Übung 3.5 &lt;!--4--&gt;
+
+Visualisiere `dhm200_2056` mit `tmap`.
+
+Tipp: Um ein Polygon zu visualisieren sind wir wie folgt vorgegangen
+
+
+```r
+tm_shape(gemeindegrenzen) + tm_polygons()
+```
+
+---
+
+## Lösung
+
+
+```r
+# tmap_mode("view") # optional
+tm_shape(dhm200_2056) + tm_raster()
+```
+
+![](05_Uebung_3_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+
+---
+
+## Übung 3.6 &lt;!--4--&gt;
+
+Verändere die Darstellungsweise des Rasters mithilfe von `style` und `palette`. Tipp, schau dir die Hilfe von `?tm_raster` an.
+
+--
+
+## Lösung
+
+
+```r
+tm_shape(dhm200_2056) + tm_raster(style = "cont", palette = "viridis")
+```
+
+![](05_Uebung_3_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+## Input &lt;!--3--&gt;
+
+- Wir haben für `DHM200.xyz` das Koordinatenbezugssystem festlegen und in das neue System transformieren müssen. 
+
+--
+
+- Wir können unser verändertes Objekt (`dhm200_2056`) nun so exportieren, so dass diese Änderungen abgespeichert werden
+
+--
+
+
+```r
+writeRaster(dhm200_2056,"_data/dhm200_2056.tif", overwrite = TRUE)
+```
+
+--
+
+- beim Importieren ist nun R sofort klar, das es sich um ein Datensatz im neuen schweizer Koordinatenbezugssystem handelt (CRS setzen und transformieren ist nicht mehr nötig)
+
+
+```r
+dhm200_2056 &lt;- rast("_data/dhm200_2056.tif")
+
+dhm200_2056
+```
+
+```
+## class       : SpatRaster 
+## dimensions  : 1141, 1926, 1  (nrow, ncol, nlyr)
+## resolution  : 200.0001, 200.0001  (x, y)
+## extent      : 2479899, 2865099, 1073900, 1302100  (xmin, xmax, ymin, ymax)
+## coord. ref. : +proj=somerc +lat_0=46.9524055555556 +lon_0=7.43958333333333 +k_0=1 +x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 +units=m +no_defs 
+## source      : dhm200_2056.tif 
+## name        :   DHM200 
+## min value   :      193 
+## max value   : 4556.412
+```
+
+
+---
+class: highlight-last-item
+
+## Rückblick
+
+Wir haben...
+
+--
+- ein Höhenmodell der Schweiz heruntergeladen
+
+--
+- 3 unterschiedliche Datenformaten von Rasterdaten kennengelernt
+
+--
+- ein Rasterdatensatz mithilfe von `rast` aus `terra` in R importiert
+
+--
+- diesem Rasterdatensatz das korrekte Koordinatenbezugssystem zugewiesen (`crs`)
+
+--
+- diesen Rasterdatensatz in ein anderes Koordinatensystem transformiert (`project`)
+
+--
+- diesen Rasterdatensatz mit `plot()` sowie `tmap` visualisert
+
+--
+- mit verschiedenen Darstellungformen in `tmap` gearbeitet (optionen `style` und `palette`)
+
+--
+- das Höhenmodell weist in jeder Zelle genau *einen* Wert auf (die Höhe). Es gibt aber Situationen, wo wir mehreren Werten pro Zelle benötigen
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

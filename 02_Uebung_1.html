@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Übung 1: Vektordaten, Koordinatenbezugssysteme, Karten</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nils Ratnaweera" />
+    <meta name="date" content="2021-11-18" />
+    <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="site_libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="site_libs/shareon-1.4.1/shareon.min.css" rel="stylesheet" />
+    <script src="site_libs/shareon-1.4.1/shareon.min.js"></script>
+    <link href="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.js"></script>
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Übung 1: Vektordaten, Koordinatenbezugssysteme, Karten
+## CAS FAB: Räumliche Daten in R
+### Nils Ratnaweera
+### Forschungsgruppe Geoinformatik
+### 2021-11-18
+
+---
+
+<style>.shareagain-bar {
+--shareagain-foreground: rgb(255, 255, 255);
+--shareagain-background: rgba(0, 0, 0, 0.5);
+--shareagain-twitter: none;
+--shareagain-facebook: none;
+--shareagain-linkedin: none;
+--shareagain-pinterest: none;
+--shareagain-pocket: none;
+--shareagain-reddit: none;
+}</style>
+
+## Vorbereitung &lt;!--3--&gt;
+
+- Erstelle ein neues RStudio Projekt
+- Erstelle ein neues R-Script mit dem Namen `Uebung_1.R`
+- Lade dir `Vegauf_Aussenberg_2019_Kopfdaten.csv` (von Moodle) herunter 
+
+---
+
+## Übung 1.1 &lt;!--10--&gt;
+
+- Importiere die CSV `Vegauf_Aussenberg_2019_Kopfdaten.csv` gewohnt als `data.frame` in R. 
+- Speichere die `data.frame` in der Variabel `ausserberg`
+
+--
+
+## Lösung
+
+
+
+```r
+ausserberg &lt;- read.csv("_data/Vegauf_Ausserberg_2019_Kopfdaten.csv", sep = "\t")
+
+ausserberg[1:6, 1:6] # ich zeige nur die ersten 6 Spalten und Zeilen
+```
+
+```
+##     Plot Verbuschung Vegetationstyp       Date geogr..Br. geogr..L.
+## 1 VS19_1   Verbuscht        Trocken 18.06.2019    2631210   1129910
+## 2 VS19_2 Unverbuscht    Halbtrocken 18.06.2019    2631175   1129752
+## 3 VS19_3   Verbuscht    Halbtrocken 19.06.2019    2631411   1129900
+## 4 VS19_4 Unverbuscht    Halbtrocken 18.06.2019    2631377   1129922
+## 5 VS19_5 Unverbuscht        Trocken 18.06.2019    2631324   1129816
+## 6 VS19_6 Unverbuscht        Trocken 19.06.2019    2631510   1129969
+```
+
+---
+
+## Übung 1.2 &lt;!--3--&gt;
+
+Such dir die Koordinaten im `data.frame` heraus. In welchem Koordinatensystem liegen diese wohl vor?
+
+--
+
+## Lösung
+
+in CH1903+ LV95
+
+
+---
+
+## Übung 1.3 &lt;!--4--&gt;
+
+Visualisiere die Erhebungsplots räumlich als Scatterplot. Die x- und y-Achsen sind jetzt räumliche Koordinaten, auf was musst du achten?
+
+--
+
+## Lösung
+
+
+```r
+plot(ausserberg$geogr..Br., ausserberg$geogr..L., asp = 1)
+```
+
+.pull-left[
+Mit `asp = 1` wird dafür gesorgt, dass die x- und y-Achsen gleich skaliert sind (es handelt sich in beiden Fällen um Meter)
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/scatterplot-1.png" width="336" /&gt;
+]
+
+---
+
+## Übung 1.4 &lt;!--3--&gt;
+
+Installiere nun das R-Package `sf` und lade es in die aktuelle Session.
+
+--
+
+## Lösung
+
+
+```r
+install.packages("sf") # installieren (mit Anführungs- und Schlusszeichen)
+```
+
+
+```r
+library(sf)            # laden (ohne Anführungs- und Schlusszeichen)
+```
+
+```
+## Linking to GEOS 3.9.0, GDAL 3.2.1, PROJ 7.2.1
+```
+
+
+---
+
+## Übung 1.5 &lt;!--5--&gt;
+
+Wir machen nun aus dem `data.frame` `ausserberg` ein Vektor-Objekt und verwenden dazu die Funktion `st_as_sf()` aus der eben installierten Library `sf`. 
+
+Mit dem Argument `coords = ` informieren wir dieser Funktion, wo unsere Koordinateninformation liegt. Probiere etwas rum bis es funktiniert und weise *danach* das Neue Objekt der Variabel `ausserberg_sf` zu.
+
+--
+
+## Lösung
+
+
+```r
+ausserberg_sf &lt;- st_as_sf(ausserberg, coords = c("geogr..Br.","geogr..L."))
+```
+
+---
+
+
+## Übung 1.6 &lt;!--2--&gt;
+
+Vergleiche nun `ausserberg` und `ausserberg_sf` in der Konsole. Wodurch unterscheiden sie sich?
+
+--
+
+## Lösung
+
+- `ausserberg_sf` hat die beiden Koordinaten-Spalten verloren und verfügt dafür neu über eine Spalte `geometry`.
+- `ausserberg_sf` verfügt nun über Metadaten im header:
+
+```
+Simple feature collection with 15 features and 34 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2631175 ymin: 1129737 xmax: 2631510 ymax: 1129986
+*CRS:           NA
+```
+
+*Wir haben nirgends deklariert, in welchem Koordinatenreferenzsystem sich unsere Koordinaten befinden.*
+
+
+---
+
+## Input &lt;!--6--&gt;
+
+Nun wollen wir unserem Datensatz das richtige Koordinatenreferenzsystem zuweisen. Wie sprechen wir das korrekte Koordinatensystem `CH1903+ LV95` an?
+
+--
+
+Im Wesentlichen gibt es 3 Methoden, ein Koordinatenreferenzsystem anzusprechen: 
+
+- proj.4
+- Well known text wkt
+- EPSG
+
+---
+
+### proj.4
+
+- In einem `proj.4`-string werden alle wichtige Aspekte des Koordinatenreferensystems abgespeichert (ellispe, datum, projection units)
+- der `proj.4`-strings verwenden ein `key=value` system, die mit `+` kombiniert werden
+- der `proj.4`-string von `CH1903+LV95` sieht folgendermassen aus: 
+
+```{}
++proj=somerc +lat_0=46.95240555555556 +lon_0=7.439583333333333 +k_0=1 
++x_0=2600000 +y_0=1200000 +ellps=bessel +towgs84=674.374,15.056,405.346,0,0,0,0 
++units=m +no_defs
+```
+
+---
+
+### Well known text wkt
+
+- Logik ähnlich wie `proj.4`-strings
+- verwenden einen anderen Sysntex anderen Syntax (`key[value]`)
+- der wkt von `CH1903+LV95` sieht folgendermassen aus
+
+```{}
+PROJCS["CH1903+ / LV95",
+    GEOGCS["CH1903+",
+        DATUM["CH1903+",
+            SPHEROID["Bessel 1841",6377397.155,299.1528128,
+                AUTHORITY["EPSG","7004"]],
+            TOWGS84[674.374,15.056,405.346,0,0,0,0],
+            AUTHORITY["EPSG","6150"]],
+        PRIMEM["Greenwich",0,
+            AUTHORITY["EPSG","8901"]],
+        UNIT["degree",0.0174532925199433,
+            AUTHORITY["EPSG","9122"]],
+        AUTHORITY["EPSG","4150"]],
+    PROJECTION["Hotine_Oblique_Mercator_Azimuth_Center"],
+    PARAMETER["latitude_of_center",46.95240555555556],
+    PARAMETER["longitude_of_center",7.439583333333333],
+    PARAMETER["azimuth",90],
+    PARAMETER["rectified_grid_angle",90],
+    PARAMETER["scale_factor",1],
+    PARAMETER["false_easting",2600000],
+    PARAMETER["false_northing",1200000],
+    UNIT["metre",1,
+        AUTHORITY["EPSG","9001"]],
+    AXIS["Y",EAST],
+    AXIS["X",NORTH],
+    AUTHORITY["EPSG","2056"]]
+```
+
+---
+
+### EPSG Code
+
+- die European Petroleum Survey Group (EPSG) war eine wissenschaftliche Organisation die sich mit Geodäsie, Vermessung und Kartographie befasst hat
+- diese haben ein öffentliche Datenbank ins leben gerufen, um Koordinatenbezugssysteme (sowie Ellipsoide und Geodätisches Datumsangaben) festzuhalten
+- jede dieser Einträge hat einen EPSG Code, mit dem man leicht auf das Eintrag verweisen kann. 
+- Der EPSG Code eines Koordinatensystems lässt sich am einfachsten über [epsg.io](https://epsg.io/) ermitteln
+
+--
+- der EPSG Code von `CH1903+LV95` lautet: `2056`
+
+
+---
+
+## Fazit &lt;!--2--&gt;
+
+- der EPSG Code ist der einfachste Weg, ein Koordinatenbezugssystem anzusprechen
+- am besten ist, man notiert sich die EPSG Codes unserer vier Wichtigsten Koordinatensysteme:
+  - `CH1903+ LV95`: `2056`
+  - `CH1903  LV03`: `21781`
+  - `WGS84`: `4326`
+  - `WGS 84 / Pseudo-Mercator`: `3857` 
+  
+&lt;!-- letzteres wurde bis dato gar nicht erwähnt --&gt;
+---
+
+## Übung 1.7 &lt;!--3--&gt;
+
+Weise nun unserem Datensatz das richtige Koordinatensystem zu. Dafür brauchst du die Funktion `st_crs` sowie den EPSG Code des Koordinatensystems. 
+
+--
+
+## Lösung
+
+
+```r
+st_crs(ausserberg_sf) &lt;- 2056
+```
+
+```
+Simple feature collection with 15 features and 34 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2631175 ymin: 1129752 xmax: 2631210 ymax: 1129910
+*Projected CRS: CH1903+ / LV95
+```
+
+
+---
+
+## Übung 1.8 &lt;!--2--&gt;
+
+Jetzt, wo `R` weiss das es sich um einen Vektordatensatz handelt regiert es auch ganz anders, wenn wir `plot` auf `aussenberg_sf` anwenden. Versuche es aus!
+
+--
+
+## Lösung
+
+
+```r
+# plot(ausserberg_sf) &lt;- macht einen Plot pro Spalte, maximal 9
+plot(ausserberg_sf["Verbuschung"]) # Plottet nur die ausgewählte Spalte
+```
+
+![](02_Uebung_1_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
+
+---
+
+## Input &lt;!--6--&gt;
+
+Der automatische Plot mit `plot()` ist noch nicht wirklich anschaulich. In `R` gibt es dezidierte libraries, um geografische Daten zu visualisieren. Wir werden im Unterricht die library `tmap` verwenden. Installiere dieses Package und lade es in die aktuelle session.
+
+
+```r
+install.packages("tmap")
+```
+
+
+```r
+library(tmap)
+```
+
+```
+## Registered S3 method overwritten by 'stars':
+##   method            from
+##   st_crs.SpatRaster sf
+```
+
+---
+layout: true
+- `tmap` funktioniert nach einem "layer"-Prinzip
+- ein Layer besteht immer aus zwei Komponenten: `tm_shape` sowie `tm_dots` (oder `tm_lines`, `tm_polygons`...)
+  - in `tm_shape()` wird der Datensatz aufgerufen
+  - in `tm_dots` etc.  werden die *Darstellungsform* des vorangegangenen Datensatzes festgelegt
+
+
+---
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) + # datensatz        
+  tm_dots()               # darstellungsform 
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap1-1.png" width="672" /&gt;
+]
+
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) + # datensatz        
+  tm_bubbles()            # darstellungsform 
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap2-1.png" width="672" /&gt;
+]
+
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "Verbuschung")
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap3-1.png" width="672" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "Verbuschung",
+             shape = "Vegetationstyp")
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap4-1.png" width="672" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "Verbuschung",
+             shape = "Vegetationstyp") +
+*  tm_layout(legend.outside = TRUE)
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap5-1.png" width="672" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "Verbuschung",
+             shape = "Vegetationstyp") +
+  tm_layout(legend.outside = TRUE,
+            legend.position = c("right","bottom"))
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap6-1.png" width="672" /&gt;
+]
+
+---
+
+.pull-left[
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "Verbuschung",
+             shape = "Vegetationstyp") +
+  tm_layout(legend.outside = TRUE,
+            legend.position = c("right","bottom")) +
+*  tm_grid(labels.rot = c(90, 0), lines = FALSE)
+```
+]
+
+.pull-right[
+&lt;img src="02_Uebung_1_files/figure-html/tmap7-1.png" width="672" /&gt;
+]
+
+
+
+---
+layout: false
+
+## Übung 1.9 &lt;!--7--&gt;
+
+Erstellt nun eine eigene Karte mit `tmap` und euren Daten. Versucht, den unten stehenden Plot zu rekonstruieren (oder probiert was eigenes). 
+
+.pull-left[
+![](02_Uebung_1_files/figure-html/unnamed-chunk-17-1.png)&lt;!-- --&gt;
+]
+
+--
+
+.pull-right[
+
+## Lösung 
+
+```r
+tm_shape(ausserberg_sf) +
+  tm_bubbles(col = "gew_Temperaturzahl", palette = "viridis") +
+  tm_layout(legend.outside = TRUE,
+            legend.position = c("right","bottom")) +
+  tm_grid(labels.rot = c(0, 90), 
+          lines = FALSE)
+```
+]
+
+
+---
+
+## Input &lt;!--4--&gt;
+
+- In der vorherigen Übung haben wir unserem Datensatz ein Koordinatensystem *zugewiesen*. 
+- Manchmal müssen wir aber Koordinaten vom einen Koordinantensystem *transformieren*. 
+- Es ist wichtig, dass man diese beiden Operationen unterscheidet
+  - *zuweisen* verändert die Koordinatenwerte *nicht*, und ist nur sinnvoll, wenn das Koordinatensystem nicht oder falsch zugewiesen wurde
+  - *transformieren* verändert die Koordinatenwerte und ist unter verschiedenen Szenarien sinnvoll (um die Daten mit anderen zu integrieren oder um die Vorzüge des Zielkoordinatensystems zu nutzen)
+
+
+---
+
+## Übung 1.10 &lt;!--3--&gt;
+
+Transformiert `ausserberg_sf` in das Koordinatenbezugssystem WGS84 und speichert den output in einer neuen Variabel (z.B `ausserberg_sf_wgs84`). Schaut euch diesen Datensatz an, was hat sich verändert?
+
+--
+
+## Lösung
+
+
+```r
+ausserberg_sf_wgs84 &lt;- st_transform(ausserberg_sf, 4326)
+```
+
+Die Metadaten haben sich verändert (vorher: `Projected CRS: CH1903+ / LV95`)
+```
+Simple feature collection with 15 features and 34 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 7.843394 ymin: 46.3183 xmax: 7.847758 ymax: 46.32055
+*Geodetic CRS:  WGS 84
+```
+Zudem haben sich die Koordinatenwerte verändert. Neu: `POINT (7.843859 46.31987)`
+
+---
+
+## Übung 1.10 &lt;!--4--&gt;
+
+Wiederhole nochmal den letzten `tmap` plot , diesmal mit dem Datensatz `ausserberg_sf_wgs84`. Wie unterscheiden sich die Plots? 
+
+--
+
+## Lösung
+
+- Die markierten Koordinaten haben sich verändert
+- Kaum merklich haben sich auch die Positionen der Punkte verändert (unterschiedliches Datum)
+
+.pull-left[
+
+
+```r
+tm_shape(ausserberg_sf_wgs84) +
+  tm_bubbles(col = "gew_Temperaturzahl", palette = "viridis") +
+  tm_layout(legend.outside = TRUE,
+            legend.position = c("right","bottom")) +
+  tm_grid(labels.rot = c(0, 90), 
+          lines = FALSE)
+```
+]
+
+.pull-right[
+![](02_Uebung_1_files/figure-html/unnamed-chunk-19-1.png)&lt;!-- --&gt;
+]
+
+
+---
+## Input &lt;!--4--&gt;
+
+- CSVs eignen sich nur bedingt um räumliche Daten abzuspeichern
+
+--
+- Um aus `Vegauf_Ausserberg_2019_Kopfdaten.csv` ein räumliches Objekt zu machen mussten wir verschiedene Schritte erledigen
+
+--
+  1. CSV als Dataframe einlesen
+
+--
+  2. CSV in `sf` objekt konvertieren
+
+--
+  3. CRS Zuweisen
+
+--
+- Wir können `ausserberg_sf` in einem explizit *räumlichen* Datenformat abspeichern, sodass die obigen Schritte beim importieren nicht nötig sind:
+
+--
+
+
+```r
+write_sf(ausserberg_sf, "_data/ausserberg.gpkg")
+```
+
+
+--
+
+Beim Einlesen von `ausserberg.gpkg` ist R nun sofort klar, dass es sich um Punktdaten im Koordinatenbezugssystem `EPSG 2056` handelt. 
+
+
+```r
+ausserberg_sf &lt;- read_sf("_data/ausserberg.gpkg")
+```
+
+
+
+---
+
+## Übung 1.11 &lt;!--15--&gt;
+
+- Importiere nun aus dem Excel Hagenmoos.xlsx das Datenblatt `KopfdatenVertikal` als `data.frame`. 
+- Konvertiere den Dataframe in ein `sf` objekt 
+- Weise das korrekte Koordinatensytem zu
+- Transformiere die Koordinaten anschliessend in WGS84
+- erstelle eine Karte mit `tmap`
+
+--
+
+## Lösung
+
+
+```r
+hangenmoos &lt;- readxl::read_excel("_data/daten_vegedaz/Hagenmoos.xlsx", "KopfdatenVertikal")
+
+hangenmoos_sf &lt;- st_as_sf(hangenmoos, coords = c("X", "Y"))
+st_crs(hangenmoos_sf) &lt;- 21781
+
+hangenmoos_sf_wgs84 &lt;- st_transform(hangenmoos_sf, 4326)
+
+tm_shape(hangenmoos_sf_wgs84) +
+  tm_bubbles(col = "Bereich")  +
+  tm_layout(legend.outside = TRUE)
+```
+
+![](02_Uebung_1_files/figure-html/unnamed-chunk-22-1.png)&lt;!-- --&gt;
+
+
+
+
+
+---
+
+## Input &lt;!--3--&gt;
+
+- Der Datensatz `Hangenmoos` beinhaltet Erhebungen an den gleichen Standorten in verschiedenen Jahren. 
+- Dies führt dazu, dass sich Punkte überlagern (gleiche Koordinaten)
+- Um dies zu vermeiden, können wir mit der `facet` option in `tmap` arbeiten
+
+
+```r
+tm_shape(hangenmoos_sf_wgs84) +
+  tm_bubbles(size = .2, col = "Bereich")  +
+  tm_layout(legend.outside = TRUE) +
+* tm_facets("Jahr",nrow = 1)
+```
+
+![](02_Uebung_1_files/figure-html/unnamed-chunk-23-1.png)&lt;!-- --&gt;
+
+- Bisher haben wir nur statische Karten (ohne Hintergrundkarte) erstellt. 
+  - Mit `tmap` lassen sich aber auch sehr leicht interaktive Karten erstellen
+  - Setze dafür `tmap_mode("view")` und führe dein letzter Code für die Erstellung eines tmap-Plots nochmals aus
+
+---
+
+## Rückblick &lt;!-- --&gt;
+
+.pull-left[
+![](images/rückblick.jpg)
+]
+
+.pull-right[
+- Bisher haben wir mit Vektordaten vom Typ `Point` gearbeitet
+- Das dem zugrundeliegende, konzeptionelle Datenmodell ist das Entitäten Modell
+- Diese Punktdaten waren in einem csv sowie einem xlsx Dateiformat abgespeichert
+- In `R` haben wir diese Punktdaten als `data.frame` importiert und danach in ein `sf` Objekt konvertiert
+- `sf`-Objekte zeichnen sich dadurch aus, dass sie über eine Geometriespalte sowie über Metadaten verfügen
+]
+
+---
+
+## Ausblick
+
+.pull-left[
+![](images/ausblick.jpg)
+]
+
+.pull-right[
+- Punktdaten lassen sich gut in CSV abspeichern, weil sich die Geometrie so gut vorhersehbar ist (jeder Punkte besteht aus genau einer x- und einer y-Koordinate)
+- Linien und Polygone sind komplexer, sie können aus beliebig vielen Knoten bestehen
+- Es bessere Wege, räumliche Daten abzuspeichern
+- Das bekannteste Format für Vektordaten ist das *shapefile*
+- Shapefiles haben aber Nachteile ein sinnvolleres Format ist deshalb *geopackage*
+]
+
+
+
+
+
+
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

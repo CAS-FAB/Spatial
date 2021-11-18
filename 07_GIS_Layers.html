@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>GIS Layer Prinzip</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Nils Ratnaweera" />
+    <meta name="date" content="2021-11-18" />
+    <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
+    <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
+    <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
+    <script src="site_libs/clipboard-2.0.6/clipboard.min.js"></script>
+    <link href="site_libs/shareon-1.4.1/shareon.min.css" rel="stylesheet" />
+    <script src="site_libs/shareon-1.4.1/shareon.min.js"></script>
+    <link href="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.css" rel="stylesheet" />
+    <script src="site_libs/xaringanExtra-shareagain-0.2.6/shareagain.js"></script>
+    <link rel="stylesheet" href="my-theme.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# GIS Layer Prinzip
+## CAS FAB: Räumliche Daten in R
+### Nils Ratnaweera
+### Forschungsgruppe Geoinformatik
+### 2021-11-18
+
+---
+
+class: highlight-last-item
+
+<style>.shareagain-bar {
+--shareagain-foreground: rgb(255, 255, 255);
+--shareagain-background: rgba(0, 0, 0, 0.5);
+--shareagain-twitter: none;
+--shareagain-facebook: none;
+--shareagain-linkedin: none;
+--shareagain-pinterest: none;
+--shareagain-pocket: none;
+--shareagain-reddit: none;
+}</style>
+
+## GIS Layer Prinzip
+
+- Bisher haben wir alle Datensätze einzeln betrachtet
+
+--
+- Wenn wir alle Datensätze ins gleiche Bezugssystem bringen, können wir diese *überlagern*
+
+--
+- Überlagern kann heissen: 
+
+--
+  - gemeinsam visualisieren
+  
+--
+  - Information übertragen
+
+  
+--
+
+**Ausgangslage:**
+
+
+```r
+library(sf)
+library(terra)
+library(tmap)
+
+ausserberg &lt;- read_sf("_data/ausserberg.gpkg")
+dhm200 &lt;- rast("_data/dhm200_2056.tif")
+```
+
+---
+
+## Visuelle Überlagerung
+
+Visuelle Überlagerung mit `+` in `tmap`
+
+
+.pull-left[
+
+```r
+tm_shape(dhm200) + 
+  tm_raster() + 
+  tm_shape(ausserberg) + 
+  tm_dots()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="07_GIS_Layers_files/figure-html/tmap1-1.png" width="672" /&gt;
+]
+
+--
+- da das `dhm200` die ganze Schweiz abdeckt, sind unsere Punkte kaum erkennbar.
+
+--
+- Lösung: raster mittels unseren Punktdaten "zuschneiden" (`crop`)
+
+---
+layout: true
+
+## Raster zuschneiden
+
+---
+
+Verschnitt von einem Raster mit `crop()`
+
+.pull-left[
+
+```r
+dhm200_cropped &lt;- terra::crop(dhm200, ausserberg)
+
+tm_shape(dhm200_cropped) + 
+  tm_raster() + 
+  tm_shape(ausserberg) + 
+  tm_dots() +
+  tm_layout(legend.outside = TRUE)
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="07_GIS_Layers_files/figure-html/tmap2-1.png" width="672" /&gt;
+]
+
+--
+- die Auflösung des Raster Datensatzes ist zu grob!!
+
+--
+- Lösung: Hoch aufgelöster Datensatz herunterladen und einlesen ([dhm25](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html), https://bit.ly/3kFgZrF)
+
+
+---
+
+Das `dhm25` verfügt im gegensatz zum `dhm200` über eine Zellgrösse von 25m
+
+
+```r
+dhm25 &lt;- rast("_data/dhm25_2056.tif") # bereits transformierter raster aus vorheriger Übung
+
+dhm25_crop &lt;- crop(dhm25, ausserberg)           
+```
+
+
+--
+
+.pull-left[
+
+```r
+tm_shape(dhm25_crop) + 
+  tm_raster(style = "cont", palette = "viridis") + 
+  tm_shape(ausserberg) + 
+  tm_dots()
+```
+]
+
+--
+
+.pull-right[
+&lt;img src="07_GIS_Layers_files/figure-html/tmap3-1.png" width="672" /&gt;
+]
+
+
+
+
+
+---
+layout: true
+
+## Rasterwerte extrahieren
+
+
+---
+class: highlight-last-item
+
+- bisher haben wir zwei Datensätze (Raster und Vektor) visuell überlagert
+
+--
+- nächster Schritt: **Information** von Raster &amp;rarr; Punkt Datensatz übertragen
+
+---
+
+
+```r
+elev &lt;- extract(dhm25, vect(ausserberg)) # &lt;- die Funktion extract() extrahiert die Information
+
+elev                                     # &lt;- der output ist eine data.frame mit 2 Spalten
+```
+
+```
+##    ID dhm25_grid_raster
+## 1   1          1307.219
+## 2   2          1269.035
+## 3   3          1284.346
+## 4   4          1292.309
+## 5   5          1282.125
+## 6   6          1281.335
+## 7   7          1320.213
+## 8   8          1292.845
+## 9   9          1267.855
+## 10 10          1307.206
+## 11 11          1277.758
+## 12 12          1281.398
+## 13 13          1287.539
+## 14 14          1244.080
+## 15 15          1294.878
+```
+
+```r
+ausserberg$elevation &lt;- elev[,2]         # &lt;- die 2. Spalte aus elev auf ausserberg übertragen
+```
+
+---
+
+
+```r
+head(ausserberg["elevation"])
+```
+
+```
+## Simple feature collection with 6 features and 1 field
+## Geometry type: POINT
+## Dimension:     XY
+## Bounding box:  xmin: 2631175 ymin: 1129752 xmax: 2631510 ymax: 1129969
+## Projected CRS: CH1903+ / LV95
+## # A tibble: 6 × 2
+##   elevation              geom
+##       &lt;dbl&gt;       &lt;POINT [m]&gt;
+## 1     1307. (2631210 1129910)
+## 2     1269. (2631175 1129752)
+## 3     1284. (2631411 1129900)
+## 4     1292. (2631377 1129922)
+## 5     1282. (2631324 1129816)
+## 6     1281. (2631510 1129969)
+```
+
+---
+
+.pull-left[
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+
+
+]
+
+.pull-right[
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+
+]
+
+???
+
+- vect() ist nötig, weil extract lieber ein SpatVector hätte als ein sf objekt
+
+---
+layout: true
+
+## Vektordaten zuschneiden
+
+---
+
+Aufgabenstellung: 
+
+- wir verfügen über einen [TWW Datensatz der Schweiz](https://www.bafu.admin.ch/bafu/de/home/themen/biodiversitaet/zustand/karten/geodaten.html) (https://bit.ly/3CqNRKT)
+- wir verfügen über den [Gemeindelayer der Schweiz](https://data.geo.admin.ch/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/shp/2056/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill.zip) (https://bit.ly/3CaAj5W)
+- wir wollen alle TWW Flächen innerhalb der Gemeinde Landquart erhalten
+
+---
+
+
+```r
+# Datensätze einlesen:
+tww &lt;- read_sf("_data/TWW/TWW_LV95/trockenwiesenweiden.shp")
+hoheitsgebiet &lt;- read_sf("_data/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_HOHEITSGEBIET.shp")
+
+# Gemeindegrenzenen in EPSG 2056 transformieren und nur Landquart selektieren
+hoheitsgebiet &lt;- st_transform(hoheitsgebiet, 2056)
+landquart &lt;- hoheitsgebiet[hoheitsgebiet$NAME == "Landquart", ]
+```
+
+
+.pull-left[
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
+]
+
+.pull-right[
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+
+]
+
+---
+
+
+```r
+tww_landquart &lt;- st_intersection(tww, landquart)
+```
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+
+
+---
+layout: true
+
+## Vektordaten selektieren
+
+
+---
+
+- Mit `st_intersection` haben wir TWW Flächen verschnitten, da `st_intersetion` die Schnittmenge beider Polygone nimmt
+
+--
+
+![:scale 50%](images/postgis-06-st-intersection.png)
+&lt;!-- https://academy.vertabelo.com/course/postgis/additional-geometry-features/functions-returning-geometries/st-intersection --&gt;
+--
+
+- Alternativ können wir alle TWW Flächen selektieren, die mindestens Teilweise innerhalb des Gemeindegebietes liegen
+
+---
+
+
+```r
+tww_landquart2 &lt;- tww[landquart, ]
+```
+
+
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+
+
+
+```
+## Deleting layer `tww_landquart' using driver `GPKG'
+## Writing layer `tww_landquart' to data source 
+##   `_data/tww_landquart.gpkg' using driver `GPKG'
+## Writing 12 features with 12 fields and geometry type Multi Polygon.
+```
+
+
+
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script src="macros.js"></script>
+<script>var slideshow = remark.create({
+"ratio": "16:9",
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>
