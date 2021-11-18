@@ -1,0 +1,316 @@
+---
+title: "GIS Layer Prinzip"
+subtitle: "CAS FAB: Räumliche Daten in R"
+author: "Nils Ratnaweera"
+institute: "Forschungsgruppe Geoinformatik"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default","default-fonts", "my-theme.css"]
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+class: highlight-last-item
+
+```{r share-again, echo=FALSE}
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "none")
+```
+
+## GIS Layer Prinzip
+
+- Bisher haben wir alle Datensätze einzeln betrachtet
+
+--
+- Wenn wir alle Datensätze ins gleiche Bezugssystem bringen, können wir diese *überlagern*
+
+--
+- Überlagern kann heissen: 
+
+--
+  - gemeinsam visualisieren
+  
+--
+  - Information übertragen
+
+  
+--
+
+**Ausgangslage:**
+
+```{r, message = FALSE, warning=FALSE}
+library(sf)
+library(terra)
+library(tmap)
+
+ausserberg <- read_sf("_data/ausserberg.gpkg")
+dhm200 <- rast("_data/dhm200_2056.tif")
+```
+
+---
+
+## Visuelle Überlagerung
+
+Visuelle Überlagerung mit `+` in `tmap`
+
+
+.pull-left[
+```{r tmap1, fig.show='hide', fig.height=3.5, warning=FALSE, message = FALSE}
+tm_shape(dhm200) + 
+  tm_raster() + 
+  tm_shape(ausserberg) + 
+  tm_dots()
+```
+]
+
+--
+
+.pull-right[
+```{r, echo=FALSE}
+knitr::include_graphics(knitr::fig_chunk("tmap1", "png"))
+```
+]
+
+--
+- da das `dhm200` die ganze Schweiz abdeckt, sind unsere Punkte kaum erkennbar.
+
+--
+- Lösung: raster mittels unseren Punktdaten "zuschneiden" (`crop`)
+
+---
+layout: true
+
+## Raster zuschneiden
+
+---
+
+Verschnitt von einem Raster mit `crop()`
+
+.pull-left[
+```{r tmap2, fig.show='hide', fig.height=3.5, warning=FALSE, message = FALSE}
+dhm200_cropped <- terra::crop(dhm200, ausserberg)
+
+tm_shape(dhm200_cropped) + 
+  tm_raster() + 
+  tm_shape(ausserberg) + 
+  tm_dots() +
+  tm_layout(legend.outside = TRUE)
+```
+]
+
+--
+
+.pull-right[
+```{r, echo=FALSE}
+knitr::include_graphics(knitr::fig_chunk("tmap2", "png"))
+```
+]
+
+--
+- die Auflösung des Raster Datensatzes ist zu grob!!
+
+--
+- Lösung: Hoch aufgelöster Datensatz herunterladen und einlesen ([dhm25](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html), https://bit.ly/3kFgZrF)
+
+
+---
+
+Das `dhm25` verfügt im gegensatz zum `dhm200` über eine Zellgrösse von 25m
+
+```{r}
+dhm25 <- rast("_data/dhm25_2056.tif") # bereits transformierter raster aus vorheriger Übung
+
+dhm25_crop <- crop(dhm25, ausserberg)           
+```
+
+
+--
+
+.pull-left[
+```{r tmap3, fig.show='hide', fig.height=3.5, warning=FALSE, message = FALSE}
+tm_shape(dhm25_crop) + 
+  tm_raster(style = "cont", palette = "viridis") + 
+  tm_shape(ausserberg) + 
+  tm_dots()
+```
+]
+
+--
+
+.pull-right[
+```{r, echo=FALSE}
+knitr::include_graphics(knitr::fig_chunk("tmap3", "png"))
+```
+]
+
+
+
+
+
+---
+layout: true
+
+## Rasterwerte extrahieren
+
+
+---
+class: highlight-last-item
+
+- bisher haben wir zwei Datensätze (Raster und Vektor) visuell überlagert
+
+--
+- nächster Schritt: **Information** von Raster &rarr; Punkt Datensatz übertragen
+
+---
+
+```{r}
+elev <- extract(dhm25, vect(ausserberg)) # <- die Funktion extract() extrahiert die Information
+
+elev                                     # <- der output ist eine data.frame mit 2 Spalten
+
+ausserberg$elevation <- elev[,2]         # <- die 2. Spalte aus elev auf ausserberg übertragen
+
+```
+
+---
+
+```{r}
+head(ausserberg["elevation"])
+```
+
+---
+
+.pull-left[
+
+```{r, echo=FALSE, warning=FALSE}
+tm_shape(dhm25_crop) + 
+  tm_raster(style = "cont", palette = "viridis") + 
+  tm_shape(ausserberg) + 
+  tm_bubbles() +
+  tm_layout(title = "dhm25 mit überlagerten Punktdaten")
+```
+
+
+]
+
+.pull-right[
+```{r, echo=FALSE, warning=FALSE}
+tm_shape(ausserberg) + 
+  tm_bubbles(col="elevation", style="cont", palette="viridis", breaks = seq(1240, 1320, 20)) +
+  tm_layout(title = "Punkdaten mit extrahierten Werten aus dhm25")
+```
+
+]
+
+???
+
+- vect() ist nötig, weil extract lieber ein SpatVector hätte als ein sf objekt
+
+---
+layout: true
+
+## Vektordaten zuschneiden
+
+---
+
+Aufgabenstellung: 
+
+- wir verfügen über einen [TWW Datensatz der Schweiz](https://www.bafu.admin.ch/bafu/de/home/themen/biodiversitaet/zustand/karten/geodaten.html) (https://bit.ly/3CqNRKT)
+- wir verfügen über den [Gemeindelayer der Schweiz](https://data.geo.admin.ch/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/shp/2056/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill.zip) (https://bit.ly/3CaAj5W)
+- wir wollen alle TWW Flächen innerhalb der Gemeinde Landquart erhalten
+
+---
+
+```{r}
+# Datensätze einlesen:
+tww <- read_sf("_data/TWW/TWW_LV95/trockenwiesenweiden.shp")
+hoheitsgebiet <- read_sf("_data/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_HOHEITSGEBIET.shp")
+
+# Gemeindegrenzenen in EPSG 2056 transformieren und nur Landquart selektieren
+hoheitsgebiet <- st_transform(hoheitsgebiet, 2056)
+landquart <- hoheitsgebiet[hoheitsgebiet$NAME == "Landquart", ]
+```
+
+
+.pull-left[
+```{r, echo = FALSE, warning=FALSE}
+tm_shape(landquart) + 
+  tm_polygons() +
+  tm_layout(title = "Gemeinde Landquart")
+```
+]
+
+.pull-right[
+```{r, echo = FALSE, warning=FALSE, fig.height=3.5}
+tm_shape(tww) + 
+  tm_polygons() +
+  tm_layout(title = "TWW der Schweiz")  +
+  tm_shape(landquart) + 
+  tm_polygons(col = "red",border.col = "red")
+```
+
+]
+
+---
+
+```{r, warning=FALSE}
+tww_landquart <- st_intersection(tww, landquart)
+```
+
+```{r, echo = FALSE}
+ tm_shape(landquart) +
+  tm_borders(col = "black") +
+  tm_shape(tww_landquart) + 
+  tm_polygons(col = "forestgreen") +
+  tm_layout(title = "TWW in Landquart")
+```
+
+
+---
+layout: true
+
+## Vektordaten selektieren
+
+
+---
+
+- Mit `st_intersection` haben wir TWW Flächen verschnitten, da `st_intersetion` die Schnittmenge beider Polygone nimmt
+
+--
+
+![:scale 50%](images/postgis-06-st-intersection.png)
+<!-- https://academy.vertabelo.com/course/postgis/additional-geometry-features/functions-returning-geometries/st-intersection -->
+--
+
+- Alternativ können wir alle TWW Flächen selektieren, die mindestens Teilweise innerhalb des Gemeindegebietes liegen
+
+---
+
+```{r}
+tww_landquart2 <- tww[landquart, ]
+```
+
+
+
+```{r, echo = FALSE}
+ tm_shape(landquart) +
+  tm_borders(col = "black") +
+  tm_shape(tww_landquart2) + 
+  tm_polygons(col = "forestgreen") +
+  tm_layout(title = "TWW in Landquart")
+```
+
+
+
+```{r, echo = FALSE}
+st_write(tww_landquart2, "_data/tww_landquart.gpkg", delete_layer = TRUE)
+```
+
+
+
+

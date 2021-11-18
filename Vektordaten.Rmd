@@ -1,0 +1,20 @@
+---
+title: Vektordaten in R
+---
+```{r, include=FALSE}
+source("functions.R", local = knitr::knit_global())
+```
+
+### Übung 1
+
+```{r, echo = FALSE}
+aufwand("02_Uebung_1")
+```
+
+### Übung 2
+
+
+```{r, echo = FALSE}
+aufwand("03_Uebung_2")
+```
+

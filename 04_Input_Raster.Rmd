@@ -1,0 +1,122 @@
+---
+subtitle: "CAS FAB: Räumliche Daten in R"
+title: "Input: Rasterdaten in R"
+author: "Nils Ratnaweera"
+institute: "Forschungsgruppe Geoinformatik"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default","default-fonts", "my-theme.css"]
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+```{r share-again, echo=FALSE}
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "none")
+```
+
+## Rückblick  <!--3-->
+
+.pull-left[
+![:scale 70%](http://gsp.humboldt.edu/olm/Lessons/GIS/08%20Rasters/Images/convertingdatamodels2.png)
+<!-- http://gsp.humboldt.edu/olm/Lessons/GIS/08%20Rasters/RasterToVector.html -->
+]
+
+.pull-right[
+- Bisher haben wir nur mit Vektordaten in R gearbeitet
+- Vektordaten sind in `data.frames` integriert und deshalb einfach zu handhaben
+- Vektordaten decken aber nur das Entitätenmodell ab
+- Das Entitätenmodel ist für viele Anwendungsgebiete Ungeeignet
+]
+
+
+---
+layout: true
+
+## Rasterdaten / Feldmodell  <!--4-->
+
+.pull-left[
+- Rasterdaten sind omnipräsent:
+  - Daten aus Fernerkundung
+  - bei Kontinuierlichen (nicht Diskrete) Daten
+  - bei Flächendeckende Daten
+<!-- gibt es noch mehr situationen?-->
+- Rasterdaten sind umständlich
+  - Tendentiell gross
+  - Oft mehrdimensional und Komplex
+  - In `R` *noch* nicht einfach in der Handhabung
+]
+
+???
+
+Kontinuierlichen Daten:  (z.B. Oberflächentemperatur)
+Flächendeckende Daten:  (z.B. Meereshöhe oder Luftbilder)
+
+---
+
+.pull-right[![](https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fgeospatialmedia.s3.amazonaws.com%2Fwp-content%2Fuploads%2F2016%2F12%2FSentinel-2_H1.jpg&f=1&nofb=1)]
+
+---
+
+.pull-right[
+<iframe src='https://map.geo.admin.ch/embed.html?lang=en&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.zeitreihen,ch.bfs.gebaeude_wohnungs_register,ch.bav.haltestellen-oev,ch.swisstopo.swisstlm3d-wanderwege,ch.astra.wanderland-sperrungen_umleitungen,ch.meteoschweiz.klimanormwerte-temperatur_1961_1990&layers_opacity=1,1,1,0.8,0.8,1&layers_visibility=false,false,false,false,false,true&layers_timestamp=18641231,,,,,&E=2658147.60&N=1229785.01&zoom=1' width='400' height='300' frameborder='0' style='border:0'></iframe>
+]
+
+
+---
+
+.pull-right[
+<iframe src='https://map.geo.admin.ch/embed.html?lang=en&topic=ech&bgLayer=ch.swisstopo.pixelkarte-farbe&layers=ch.swisstopo.digitales-hoehenmodell_25_reliefschattierung&E=2720000.00&N=1166875.00&zoom=1' width='400' height='300' frameborder='0' style='border:0'></iframe>
+]
+
+
+---
+layout: true
+
+# Raster Datenstruktur  <!--3-->
+
+---
+
+.pull-left[
+- Der gesamte Raum ist mosaikiert &rarr; in regelmässige Zellen aufgeteilt 
+- Jede Raster-Zelle hat einen *einzigen* Wert
+]
+
+
+.pull-right[
+![](https://datacarpentry.org/organization-geospatial/fig/dc-spatial-raster/raster_concept.png)
+<!-- https://datacarpentry.org/organization-geospatial/01-intro-raster-data/ -->
+]
+
+
+---
+
+.pull-left[
+- Die Zellen bilden eine Ebene (layer), welche in der Regel eine semantische Einheit bildet
+- Mehrere Ebene können zeitliche Veränderung aufzeigen oder sich zu einem Gesamtbild zusammenfügen
+]
+
+
+
+.pull-right[
+![](https://datacarpentry.org/organization-geospatial/fig/dc-spatial-raster/RGBSTack_1.jpg)
+<!-- https://datacarpentry.org/organization-geospatial/01-intro-raster-data/ -->
+]
+
+---
+
+.pull-left[
+- Die Zellengrösse bestimmt die Auflösung
+]
+
+.pull-right[
+![](https://datacarpentry.org/organization-geospatial/fig/dc-spatial-raster/raster_resolution.png)
+<!-- https://datacarpentry.org/organization-geospatial/01-intro-raster-data/ -->
+]
+
+

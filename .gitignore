@@ -1,0 +1,7 @@
+.Rproj.user/
+.Rhistory
+_data/
+_site/
+/*_files
+libs/
+/*.html

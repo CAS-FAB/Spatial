@@ -1,0 +1,20 @@
+img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* adds background color to inline code */
+code{
+  background: #f8f8f8;
+}
+
+/* https://www.garrickadenbuie.com/blog/better-progressive-xaringan/?panelset=r-markdown*/
+.highlight-last-item > ul > li,
+.highlight-last-item > ol > li {
+  opacity: 0.5;
+}
+.highlight-last-item > ul > li:last-of-type,
+.highlight-last-item > ol > li:last-of-type {
+  opacity: 1;
+}

@@ -1,0 +1,12 @@
+---
+title: "CAS FAB: Räumliche Daten in R"
+---
+
+```{r, include=FALSE}
+source("functions.R", local = knitr::knit_global())
+```
+
+```{r, echo = FALSE}
+aufwand("01_Einfuehrung")
+```
+

@@ -1,0 +1,182 @@
+---
+subtitle: "CAS FAB: Räumliche Daten in R"
+title: "Übung 4: Komplexe Rasterdaten"
+author: "Nils Ratnaweera"
+institute: "Forschungsgruppe Geoinformatik"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default","default-fonts", "my-theme.css"]
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+```{r share-again, echo=FALSE}
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "none")
+```
+
+## Input: Komplexe Rasterdaten
+
+.pull-left[
+- Satelliten und Drohnen nehmen meist verschiedene Spektren von Elektromagnetischen Wellen auf
+- diese Spektren werden in unterschiedlichen Datensätzen abgespeichert
+- diese Datensätze müssen wieder zusammengefügt werden um ein Gesamtbild zu erhalten
+- Beispiel: Rot, Grün und Blau werte fügen sich zu einem Farbluftbild zusammen
+]
+
+
+.pull-right[
+![](https://datacarpentry.org/organization-geospatial/fig/dc-spatial-raster/RGBSTack_1.jpg)
+<!-- https://datacarpentry.org/organization-geospatial/01-intro-raster-data/ -->
+]
+
+---
+
+
+
+## Übung 4.1 <!-- 3-->
+
+.pull-left[
+- Ladet euch den Datensatz [`swissimage 25` ](https://www.swisstopo.admin.ch/de/geodata/images/ortho/swissimage25.html) von Swisstopo herunter
+- Shortlink: https://bit.ly/3qGTjXN
+- Enzipped den Inhalt in euer RStudio Projekt und schaut den Inhalt an
+  - Was ist das Koordinatenbezugssystem? Wie hoch ist die räumliche Auflösung?
+]
+
+
+.pull-right[
+![](https://www.swisstopo.admin.ch/content/swisstopo-internet/de/geodata/images/ortho/swissimage25/_jcr_content/contentPar/textimage/image.transform.1606150942318/noresize/image.swissimage25.jpg)
+<!-- https://www.swisstopo.admin.ch/de/geodata/images/ortho/swissimage25.html -->
+]
+
+--
+
+## Lösung
+
+1. Koordinatenbezugssystem: EPSG 2056
+2. räumliche Auflösung: 25m
+
+---
+
+## Übung 4.2 <!-- 3-->
+
+- Erstelle ein neues R Script mit dem Namen `Uebung_4.R` 
+- Lade die libraries `sf`, `tmap` und `terra`. 
+- Importiere den Swissimage Datensatz 
+- Weise dem importierten Datensatz das Korrekte Koordinatenbezugssystem zu
+- Schau dir den Datensatz in der Konsole sowie mit `plot()` an
+--
+
+## Lösung
+
+```{r}
+library(sf)
+library(tmap)
+library(terra)
+
+swissimage <- rast("_data/swissimage25/SWISSIMAGE25m/SI25-2012-2013-2014.tif")
+
+crs(swissimage) <- "epsg: 2056"
+
+```
+
+---
+
+
+```{r}
+plot(swissimage)
+```
+
+
+---
+
+```{r, highlight.output = 2}
+swissimage
+```
+
+---
+class: highlight-last-item
+
+## Input: Seltsamer bug mit `tmap`  <!-- 3-->
+
+--
+- Um ein `rgb` Datensatz mit `tmap` zu plotten, verwenden wir nicht mehr `tm_raster()` sondern `tm_rgb`
+
+--
+- `tm_shape(swissimage) + tm_rgb()`
+
+--
+- Obwohl wir das Koordinatenbezugssystem korrekt gesetzt haben, kann `tmap` diese nicht interpretieren
+
+--
+- dies äussert sich in der folgenden Warnung:
+
+--
+- `Current projection of shape swissimage unknown and cannot be determined.`
+
+--
+- Hier kann ich euch nur folgenden (unbefriedigenden) Workaround anbieten
+
+--
+
+```{r projectswissimage}
+swissimage <- project(swissimage, "epsg: 2056")
+```
+
+--
+- Damit wir diese Änderungen speichern können, exportiere ich `swissimage` als neues `tif`-File
+```{r}
+terra::writeRaster(swissimage, "_data/swissimage.tif", overwrite = TRUE)
+```
+
+
+
+---
+
+```{r}
+# zwar meldet `tmap` nun "Discarded datum CH1903+ in Proj4 definition" 
+# dies muss uns nicht kümmern
+tm_shape(swissimage) + 
+  tm_rgb()
+
+```
+
+---
+
+## Input
+
+--
+- In einer vorangegangenen Übung haben wir das Höhenmodell `dhm200` importiert
+
+--
+- dabei handelt es sich um ein Höhenmodell mit 200m Auflösung
+
+-- 
+- diese ist in vielen Fällen ausreichend, kann aber auch zu grob sein
+
+-- 
+- swisstopo stellt zusätzlich das [`dhm25`](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html) mit 25m Auflösung zur Verfügung (https://bit.ly/3kFgZrF)
+
+--
+- durch die höhere Auflösung dauert das transformieren in ein neues Koordinatensystem etwas länger
+
+--
+- in solchen Situationen verwende ich 2 Tricks
+  - mit `filename =` den Output direkt in ein File speichern
+  - mit `progress = TRUE` den Fortschritt anzeigen lassen
+
+```{r, eval = FALSE}
+dhm25 <- rast("_data/DHM25_MM_ASCII_GRID/ASCII_GRID_1part/dhm25_grid_raster.asc")
+crs(dhm25) <- "epsg: 21781"
+
+terra::project(dhm25, "epsg: 2056", filename = "_data/dhm25_2056.tif", progress = TRUE)
+```
+
+
+
+

@@ -1,0 +1,200 @@
+---
+title: "Sampling Design mit R"
+subtitle: "CAS FAB: Räumliche Daten in R"
+author: "Nils Ratnaweera"
+institute: "Forschungsgruppe Geoinformatik"
+date: "`r Sys.Date()`"
+output:
+  xaringan::moon_reader:
+    css: ["default","default-fonts", "my-theme.css"]
+    lib_dir: libs
+    nature:
+      ratio: "16:9"
+      beforeInit: "macros.js"
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+```{r share-again, echo=FALSE}
+xaringanExtra::use_share_again()
+xaringanExtra::style_share_again(share_buttons = "none")
+```
+
+
+## Sampling Desing mit R
+
+![:scale 60%](images/sampling-design-folie.png)
+
+???
+
+R eignet sich hervorragend um ein Sampling Design umzusetzen
+
+---
+
+Unser Sampling Design (2 Varianten):
+
+1. systematisch
+2. zufällig 
+
+
+```{r, warning=FALSE, message=FALSE}
+library(sf)
+library(terra)
+library(tmap)
+
+tww_landquart <- read_sf("_data/tww_landquart.gpkg")
+```
+
+
+```{r, echo = FALSE}
+base_plot <- tm_shape(tww_landquart, bbox = tww_landquart[tww_landquart$Name %in% c("Prafieb","Frättis", "Jerätsch"),]) + 
+  tm_polygons(col = "Name") + 
+  tm_layout(legend.show = FALSE)
+```
+
+---
+layout: true
+
+
+## Zufällig und gleichmässig verteilt
+
+---
+
+
+- Gleich viele samples (10) pro *Multi*polygon
+- Samples sind zufällig verteilt
+
+```{r}
+tww_landquart$equal_samples <- 10
+sample_plots1 <- st_sample(tww_landquart, size = tww_landquart$equal_samples, by_polygon = TRUE)
+```
+
+
+```{r, echo = FALSE, fig.height=5.5}
+base_plot +
+  tm_shape(sample_plots1) +
+  tm_dots(shape = 3)
+```
+
+---
+
+
+
+- Gleich viele samples (10) pro ~~Multi~~polygon
+- Samples sind zufällig verteilt
+
+
+```{r, warning=FALSE}
+tww_landquart_polygon <- st_cast(tww_landquart, "POLYGON")
+```
+
+--
+
+.pull-left[
+
+`tww_landquart` (`r nrow(tww_landquart)` Zeilen):
+
+```{r, echo = FALSE}
+knitr::kable(head(tww_landquart["Name"]))
+```
+]
+
+--
+
+.pull-right[
+
+`tww_landquart_polygon` (`r nrow(tww_landquart_polygon)` Zeilen):
+
+```{r, echo = FALSE}
+knitr::kable(head(tww_landquart_polygon["Name"]))
+```
+]
+
+
+```{r, warning=FALSE, echo = FALSE}
+tww_landquart_polygon$equal_samples <- 10
+sample_plots1b <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$equal_samples, by_polygon = TRUE)
+```
+
+
+---
+
+.pull-left[
+```{r, echo = FALSE}
+base_plot +
+  tm_shape(sample_plots1) +
+  tm_dots(shape = 3) +
+  tm_layout(title = "10 samples pro MULTIpolygon")
+```
+]
+
+
+.pull-right[
+```{r, echo = FALSE}
+base_plot +
+  tm_shape(sample_plots1b) +
+  tm_dots(shape = 3) +
+  tm_layout(title = "10 samples pro Polygon")
+
+```
+]
+
+---
+layout: true
+
+## Zufällig und in Abhängigkeit der Flächengrösse verteilt
+
+---
+
+- Anzahl Samples ist abhängig von der Flächengrösse (1 Sample pro 4'000 m2)
+- Samples sind zufällig verteilt
+
+```{r}
+
+tww_landquart_polygon$SHAPE_Area <- st_area(tww_landquart_polygon) # Flächengrösse muss aktualisiert werden!
+
+tww_landquart_polygon$relative_samples <- as.integer(round(tww_landquart_polygon$SHAPE_Area/4000))
+```
+
+--
+
+```{r, echo = FALSE}
+knitr::kable(head(tww_landquart_polygon[,c("Name","SHAPE_Area", "relative_samples")]))
+```
+
+--
+
+
+```{r}
+sample_plots2 <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples, by_polygon = TRUE)
+```
+
+---
+
+```{r, echo = FALSE, fig.height=6.5}
+base_plot +
+  tm_shape(sample_plots2) +
+  tm_dots(shape = 3)
+```
+
+---
+layout: false
+
+## Gleichmässig verteilt
+
+- Regelmässige Verteilung der Samples (auf einem "Raster")
+- Implizit abhängig von der Flächengrösse (grosse Polygone erhalten mehr Samples)
+
+```{r}
+sample_plots3 <- st_sample(tww_landquart, size = 200, type = "regular")
+```
+
+--
+
+```{r, echo = FALSE}
+base_plot +
+  tm_shape(sample_plots3) +
+  tm_dots(shape = 3)
+```
+
+

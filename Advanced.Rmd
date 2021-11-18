@@ -1,0 +1,27 @@
+---
+title: Fortgeschrittene Themen
+---
+
+```{r, include=FALSE}
+source("functions.R", local = knitr::knit_global())
+```
+
+### GIS Layers
+
+```{r, echo = FALSE}
+aufwand("07_GIS_Layers")
+```
+
+### Sampling Design
+
+```{r, echo = FALSE}
+aufwand("08_Sampling_Design")
+```
+
+
+### Komplexe Karten
+
+```{r, echo = FALSE}
+aufwand("09_Advanced_Mapping")
+```
+

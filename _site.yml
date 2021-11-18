@@ -1,0 +1,13 @@
+name: "CAS FAB: Räumliche Daten in R"
+exclude: ["docs/"]
+navbar:
+  title: "CAS FAB: Räumliche Daten in R"
+  left:
+    - text: "Einführung"
+      href: index.html
+    - text: "Vektordaten"
+      href: Vektordaten.html
+    - text: "Rasterdaten"
+      href: Rasterdaten.html
+    - text: "Fortgeschritten"
+      href: Advanced.html
