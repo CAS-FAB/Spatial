@@ -15,32 +15,14 @@ output:
       highlightLines: true
       countIncrementalSlides: false
 ---
+layout: true
+
 ```{r share-again, echo=FALSE}
 xaringanExtra::use_share_again()
 xaringanExtra::style_share_again(share_buttons = "none")
 
 ```
 
-
-<iframe src="https://www.zhaw.ch/en/about-us/person/rata/" style="border:0px #ffffff none;" name="myiFrame" scrolling="yes" frameborder="1" marginheight="0px" marginwidth="0px" height="700px" width="100%" allowfullscreen></iframe>
-
----
-
-## Tagesablauf <!--2-->
-
-```{r, echo = FALSE, results='asis'}
-rl <- readLines("Drehbuch.md")
-
-rl <- rl[startsWith(rl, "##")]
-
-plan <- paste("-",sapply(strsplit(rl, "### "), function(x){x[2]}))
-
-cat(plan, sep = "\n")
-
-```
-
----
-layout: true
 
 # Was sind räumliche Daten? <!--2-->
 
@@ -84,32 +66,38 @@ Räumlich muss sich nicht immer auf unsere Erde beziehen!
 Infrarotaufnahmen von Titan, einem Saturn-Mond aus der Cassini-Huygens mission
 
 ---
+class: highlight-last-item
 
+--
 - Räumliche Daten sind Daten mit einem *Raumbezug* 
+
+--
   - typischerweise handelt es sich um einen 2- oder 3-dimensionaler Raum
-  - engl: spatial data
-- *Geo*daten sind räumliche Daten mit Bezug zur Erde
-  - 2-, 3- oder 4-\* dimensionaler Raum
   
+--
+  - engl: spatial data
 
-\* Zeitliche Dimension
+--
+- *Geo*daten sind räumliche Daten mit Bezug zur Erde
+
+--
+  - 2-, 3- oder n- dimensionaler Raum
+
+--
+- Sie berücksichtigen Attribute (die Semantik) und ihre räumliche Information
+
+--
+- das "was" und das "wo"
+
+--
+- beide Aspekte können auf unterschiedliche Art und Weise beschrieben werden (konzeptionelle Raummodelle)
 
 
----
-layout: false
-exclude: true
+???
 
-# Für eine Geodatenanalyse brauche ich
 
-* Ein __Modell__ zur Abbildung der Umwelt
-  * Konzeptionelle Datenmodelle: __Entitäten__ oder __Felder__
-* __Datenstrukturen__ zur Speicherung der Lage und Attribute
-  * Vektor (Punkte, Linien, Polygone) oder Raster
-  * jeweils mit den bekannten R Datentypen: character, numeric, vector
-  * mit einem Koordinatensystem (WGS84, CH1903+ LV95)
-* Räumliche __Beziehungen__ für die Analyse
-  * Geometrie (x,y,z)
-  * Topologie (räumliche Beziehungen zwischen Objekten)
+Semantik: Bedeutung, Inhalt (eines Wortes, Satzes oder Textes)
+
 
 ---
 layout: true
@@ -117,18 +105,36 @@ layout: true
 # Konzeptionelle Raummodelle <!--5-->
 
 ---
+class: highlight-last-item
 
-- Geodaten berücksichtigen Attribute (die Semantik) und ihre räumliche Information
-- das "was" und das "wo"
-- beide Aspekte können auf unterschiedliche Art und Weise beschrieben werden
+![](images/raster_vector.gif)
+
+
+--
 - **Entitäts-Modell**
+
+--
   - Der Raum ist mit *diskreten Objekten* bevölkert
+  
+--
   - jedes Objekt verfügt über ein oder mehrere Attribute
+  
+--
   - jedes Objekt hat einen bestimmte Geometrie (Punkt, Linie oder Polygon)
+  
+--
   - entspricht einem Vektor-Datenformat
+
+--
 - **Feld-Modell**
-  - Die zu untersuchende räumliche Eigenheit hat eine *kontinuierliche räumliche Existenz*
+
+--
+  - die räumliche Eigenheit hat eine *kontinuierliche räumliche Existenz*
+  
+--
   - jeder Punkt im Raum hat einen Wert
+  
+--
   - entspricht einem Raster-Datenformat
   
 
@@ -157,28 +163,52 @@ Skigebiet St Moritz:
 ---
 
 layout: true
-# Datenformat: Vector <!--2-->
+# Entitätenmodel: Vector Datenformat <!--2-->
+
+```{r, echo = FALSE, message=FALSE, warning=FALSE}
+library(sf)
+library(purrr)
+library(ggplot2)
+library(dplyr)
+my_geopackage <- "_data/processed/st_moritz.gpkg"
+
+mylayers <- st_layers(my_geopackage)$name
+
+mylayers <- setNames(mylayers, mylayers)
+datasets <- map(mylayers, ~read_sf(my_geopackage, .x))
+
+datasets <- map(datasets, ~st_transform(.x, 2056))
+
+```
+
 
 ---
 
 ## Punkte
 
-.pull-left[
+
 ```
    name                            geom
    <chr>                    <POINT [m]>
  1 Europa             (2782399 1150371)
- 2 Kulm               (2784447 1152572)
- 3 Badrutt's Palace   (2784380 1152371)
- 4 Monopol            (2784291 1152517)
- 5 Misani             (2785587 1153966)
- 6 Hotel Bären        (2784735 1152855)
 ```
-]
 
-.pull-right[
-![](images/hotels.jpg)
-]
+
+
+```{r, echo = FALSE, fig.height=5}
+
+set.seed(10)
+
+myhotel <- sample_n(datasets[["hotels"]], 10)
+
+ggplot() +
+  geom_sf(data = myhotel)  +
+  coord_sf(datum = 2056) +
+  theme_classic()
+```
+
+
+
 
 
 
@@ -186,16 +216,28 @@ layout: true
 
 ## Linien  <!--2-->
 
-.pull-lef[
+
 ```
   name                                                                        geom
   <chr>                                                      <MULTILINESTRING [m]>
 1 Via Nouva ((2785946 1153895, 2785913 1153864, 2785870 1153819, 2785812 1153755))
 ```
-]
 
 
-![:scale 30%](images/roads.jpg)
+```{r, echo = FALSE, fig.height=5}
+
+set.seed(10)
+
+myroad <- sample_n(datasets[["roads"]], 1)
+ggplot() +
+  geom_sf(data = myroad) +
+  geom_sf(data = st_cast(myroad, "POINT",warn = FALSE)) +
+  coord_sf(datum = 2056) +
+  theme_classic()
+```
+
+
+
 
 
 
@@ -209,7 +251,40 @@ layout: true
 1 Hafnerwald (((2787615 1149733, 2787620 1149732, 2787612 1149732, 2787615 1149733)))
 ```
 
-![:scale 30%](images/forest.jpg)
+
+```{r, echo = FALSE, fig.height=5}
+
+set.seed(10)
+
+myforest <- sample_n(datasets[["forest"]], 1)
+
+ggplot() +
+  geom_sf(data = myforest) +
+  geom_sf(data = st_cast(myforest, "POINT",warn = FALSE)) +
+  coord_sf(datum = 2056) +
+  theme_classic()
+```
+
+
+---
+layout: false
+
+# Feldmodell: Raster Datenformat <!--2-->
+
+
+```{r, echo=FALSE, fig.height=5.5, warning=FALSE}
+library(terra)
+library(tmap)
+dhm200 <- rast("_data/processed/dhm200_2056.tif")
+
+dhm200_st_moriz <- crop(dhm200, datasets[["bbox"]])
+
+tm_shape(dhm200_st_moriz) + tm_raster() +
+  tm_layout(legend.show = FALSE) +
+  tm_grid(lines = FALSE)
+
+```
+
 
 ---
 layout: true
@@ -253,10 +328,12 @@ beide Koordinatenreferenzsysteme
 
 - sind nur auf die Schweiz und Liechtenstein anwendbar
 - sind in Meter zu verstehen
-- sind kartesische Koordinatensysteme ("die Erde ist Flach")
+- sind *projezierte Koordinatenreferenzsysteme*
 ]
 
 ---
+
+
 layout: true
 
 # Projektionen  <!--4-->
@@ -268,8 +345,9 @@ layout: true
 ]
 
 .pull-right[
-- die Form der Erde lässt nur mit Verzerrungen auf eine kartesisches Koordinatensytem zwingen ("Orangenschalen-Problematik")
-- diese Verzerrungen kann man räumlich minimieren. So entwickelten sich eine Vielzahl unterschiedliche Projektionen und Koordinatenreferenzsystem
+- die Form der Erde lässt nur mit Verzerrungen auf eine 2D Fläche zwingen ("Orangenschalen-Problematik")
+- diese Verzerrungen kann man räumlich minimieren
+- So entwickelten sich eine Vielzahl unterschiedliche Projektionen und Koordinatenreferenzsystem
 ]
 
 ---
@@ -303,14 +381,19 @@ layout: true
 ]
 
 .pull-right[
-- Projizierte Koordinatensysteme (wie `CH1903 LV95`) sind nur auf bestimmte Regionen anwendbar
-- Daneben gibt es *Geografische Koordinatensysteme*, welche Längen- und Breitengrade verwenden
-- Sind für globale Daten sinnvoll, für Lokale Anwendungen (kleines Untersuchungsgebiet) umständlich (Distanzen, Winkel und Flächen sind schwierig zu berechnen)
-- Auch diese unterliegen Modellen der Erde und sind somit nur Annäherungen (die Erde ist eine Kartoffel)
-- Es gibt verschiedene Geographische Koordinatensysteme, für uns relevant ist nur *WGS84*
+*Geografische Koordinatensysteme*:
+
+- verwenden Längen- und Breitengrade
+- sind für globale Daten sinnvoll
+- sind für kleinräumige Anwendungen umständlich 
+- unterliegen ebenfalls räumlichen ungenauigkeiten 
+- sind in einer Vielzahl verfügbar, für uns relevant ist v.a. *WGS84*
 ]
 
+???
 
-
+- Projizierte Koordinatensysteme (wie `CH1903 LV95`) sind nur auf bestimmte Regionen anwendbar
+(Distanzen, Winkel und Flächen sind schwierig zu berechnen)
+(die Erde ist eine Kartoffel)
 
 

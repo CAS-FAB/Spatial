@@ -1,6 +1,6 @@
 ---
 subtitle: "CAS FAB: Räumliche Daten in R"
-title: "Übung 1: Vektordaten, Koordinatenbezugssysteme, Karten"
+title: "Übung 1: Einfache Vektordaten"
 author: "Nils Ratnaweera"
 institute: "Forschungsgruppe Geoinformatik"
 date: "`r Sys.Date()`"
@@ -24,7 +24,7 @@ xaringanExtra::style_share_again(share_buttons = "none")
 
 - Erstelle ein neues RStudio Projekt
 - Erstelle ein neues R-Script mit dem Namen `Uebung_1.R`
-- Lade dir `Vegauf_Aussenberg_2019_Kopfdaten.csv` (von Moodle) herunter 
+- Lade dir `Vegauf_Aussenberg_2019_Kopfdaten.csv` (von Moodle, Kurstag 12) herunter 
 
 ---
 
@@ -39,7 +39,7 @@ xaringanExtra::style_share_again(share_buttons = "none")
 
 
 ```{r}
-ausserberg <- read.csv("_data/Vegauf_Ausserberg_2019_Kopfdaten.csv", sep = "\t")
+ausserberg <- read.csv("_data/original/Vegauf_Ausserberg_2019_Kopfdaten.csv", sep = "\t")
 
 ausserberg[1:6, 1:6] # ich zeige nur die ersten 6 Spalten und Zeilen
 ```
@@ -67,19 +67,23 @@ Visualisiere die Erhebungsplots räumlich als Scatterplot. Die x- und y-Achsen s
 
 ## Lösung
 
-```{r scatterplot, fig.height=3.5, fig.width=3.5, fig.show='hide'}
-plot(ausserberg$geogr..Br., ausserberg$geogr..L., asp = 1)
-```
 
 .pull-left[
-Mit `asp = 1` wird dafür gesorgt, dass die x- und y-Achsen gleich skaliert sind (es handelt sich in beiden Fällen um Meter)
+```{r scatterplot, fig.height=3.5, fig.width=3.5, fig.show='hide'}
+plot(ausserberg$geogr..Br., ausserberg$geogr..L., asp = 1)
+# zu beachten:
+# - Reihenfolge der Koordinaten
+# - asp = 1
+```
 ]
 
 .pull-right[
-```{r, echo = FALSE}
+```{r, echo = FALSE,  fig.height=3.5, fig.width=3.5}
 knitr::include_graphics(knitr::fig_chunk("scatterplot", "png"))
 ```
 ]
+
+
 
 ---
 
@@ -117,9 +121,11 @@ ausserberg_sf <- st_as_sf(ausserberg, coords = c("geogr..Br.","geogr..L."))
 ```
 
 ---
-
+layout: true
 
 ## Übung 1.6 <!--2-->
+
+---
 
 Vergleiche nun `ausserberg` und `ausserberg_sf` in der Konsole. Wodurch unterscheiden sie sich?
 
@@ -135,13 +141,26 @@ Simple feature collection with 15 features and 34 fields
 Geometry type: POINT
 Dimension:     XY
 Bounding box:  xmin: 2631175 ymin: 1129737 xmax: 2631510 ymax: 1129986
+CRS:           NA
+```
+
+---
+
+```
+Simple feature collection with 15 features and 34 fields
+Geometry type: POINT
+Dimension:     XY
+Bounding box:  xmin: 2631175 ymin: 1129737 xmax: 2631510 ymax: 1129986
 *CRS:           NA
 ```
 
-*Wir haben nirgends deklariert, in welchem Koordinatenreferenzsystem sich unsere Koordinaten befinden.*
+--
+
+*Wir haben nirgends deklariert, in welchem Koordinatenbezugssystem sich unsere Koordinaten befinden.*
 
 
 ---
+layout: false
 
 ## Input <!--6-->
 
@@ -159,7 +178,7 @@ Im Wesentlichen gibt es 3 Methoden, ein Koordinatenreferenzsystem anzusprechen:
 
 ### proj.4
 
-- In einem `proj.4`-string werden alle wichtige Aspekte des Koordinatenreferensystems abgespeichert (ellispe, datum, projection units)
+- In einem `proj.4`-string werden alle wichtige Aspekte des Koordinatenreferensystems abgespeichert (ellipse, datum, projection units)
 - der `proj.4`-strings verwenden ein `key=value` system, die mit `+` kombiniert werden
 - der `proj.4`-string von `CH1903+LV95` sieht folgendermassen aus: 
 
@@ -174,7 +193,7 @@ Im Wesentlichen gibt es 3 Methoden, ein Koordinatenreferenzsystem anzusprechen:
 ### Well known text wkt
 
 - Logik ähnlich wie `proj.4`-strings
-- verwenden einen anderen Sysntex anderen Syntax (`key[value]`)
+- verwenden einen anderen Syntax (`key[value]`)
 - der wkt von `CH1903+LV95` sieht folgendermassen aus
 
 ```{}
@@ -209,30 +228,39 @@ PROJCS["CH1903+ / LV95",
 
 ### EPSG Code
 
-- die European Petroleum Survey Group (EPSG) war eine wissenschaftliche Organisation die sich mit Geodäsie, Vermessung und Kartographie befasst hat
-- diese haben ein öffentliche Datenbank ins leben gerufen, um Koordinatenbezugssysteme (sowie Ellipsoide und Geodätisches Datumsangaben) festzuhalten
-- jede dieser Einträge hat einen EPSG Code, mit dem man leicht auf das Eintrag verweisen kann. 
-- Der EPSG Code eines Koordinatensystems lässt sich am einfachsten über [epsg.io](https://epsg.io/) ermitteln
+- die European Petroleum Survey Group (EPSG): ein wissenschaftliche Organisation (Geodäsie, Vermessung und Kartographie)
 
 --
-- der EPSG Code von `CH1903+LV95` lautet: `2056`
+- öffentliche Datenbank um Koordinatenbezugssysteme (sowie Ellipsoide und Geodätisches Datumsangaben) festzuhalten
 
+--
+- jede Einträge hat einen Referenz Code (siehe [epsg.io](https://epsg.io/))
 
----
+--
+-  Wie lautet der EPSG Code für `CH1903+LV95`?
 
-## Fazit <!--2-->
-
+--
 - der EPSG Code ist der einfachste Weg, ein Koordinatenbezugssystem anzusprechen
-- am besten ist, man notiert sich die EPSG Codes unserer vier Wichtigsten Koordinatensysteme:
+
+--
+- am besten ist, man notiert sich die EPSG Codes unserer vier Wichtigsten Koordinatenbezugssysteme:
+
+--
   - `CH1903+ LV95`: `2056`
+
+--
   - `CH1903  LV03`: `21781`
-  - `WGS84`: `4326`
-  - `WGS 84 / Pseudo-Mercator`: `3857` 
   
-<!-- letzteres wurde bis dato gar nicht erwähnt -->
+--
+  - `WGS84`: `4326`
+  
+--
+  - `WGS 84 / Pseudo-Mercator`: `3857` <!-- wurde bis dato gar nicht erwähnt -->
 ---
 
-## Übung 1.7 <!--3-->
+
+
+## Übung 1.8 <!--3-->
 
 Weise nun unserem Datensatz das richtige Koordinatensystem zu. Dafür brauchst du die Funktion `st_crs` sowie den EPSG Code des Koordinatensystems. 
 
@@ -242,6 +270,11 @@ Weise nun unserem Datensatz das richtige Koordinatensystem zu. Dafür brauchst d
 
 ```{r}
 st_crs(ausserberg_sf) <- 2056
+```
+
+
+```{r, eval = FALSE}
+ausserberg_sf
 ```
 
 ```
@@ -255,9 +288,11 @@ Bounding box:  xmin: 2631175 ymin: 1129752 xmax: 2631210 ymax: 1129910
 
 ---
 
-## Übung 1.8 <!--2-->
+## Übung 1.9 <!--2-->
 
-Jetzt, wo `R` weiss das es sich um einen Vektordatensatz handelt regiert es auch ganz anders, wenn wir `plot` auf `aussenberg_sf` anwenden. Versuche es aus!
+- `R` weiss nun, das es sich bei `aussenberg_sf`um einen Vektordatensatz handelt 
+- `aussenberg_sf` reagiert nun anders auf gewisse funktions
+- teste die Funktion `plot` mit `aussenberg_sf`
 
 --
 
@@ -272,7 +307,9 @@ plot(ausserberg_sf["Verbuschung"]) # Plottet nur die ausgewählte Spalte
 
 ## Input <!--6-->
 
-Der automatische Plot mit `plot()` ist noch nicht wirklich anschaulich. In `R` gibt es dezidierte libraries, um geografische Daten zu visualisieren. Wir werden im Unterricht die library `tmap` verwenden. Installiere dieses Package und lade es in die aktuelle session.
+- In `R` gibt es dezidierte libraries, um geografische Daten zu visualisieren
+- Wir werden im Unterricht die library `tmap` verwenden. 
+- Installiere dieses Package und lade es in die aktuelle session.
 
 ```{r, eval = FALSE}
 install.packages("tmap")
@@ -283,14 +320,19 @@ library(tmap)
 
 ```
 
+???
+
+- Der automatische Plot mit `plot()` ist noch nicht wirklich anschaulich. 
+
 ---
 layout: true
+
+## Input
+
 - `tmap` funktioniert nach einem "layer"-Prinzip
-- ein Layer besteht immer aus zwei Komponenten: `tm_shape` sowie `tm_dots` (oder `tm_lines`, `tm_polygons`...)
-  - in `tm_shape()` wird der Datensatz aufgerufen
-  - in `tm_dots` etc.  werden die *Darstellungsform* des vorangegangenen Datensatzes festgelegt
-
-
+- ein Layer besteht aus 2 Komponenten: 
+  - `tm_shape()`: der Datensatz
+  - `tm_dots` (oder `tm_lines`, `tm_polygons`...):  die *Darstellungsform*
 ---
 .pull-left[
 ```{r tmap1, fig.show='hide', fig.height=3.5}
@@ -360,7 +402,7 @@ knitr::include_graphics(knitr::fig_chunk("tmap4", "png"))
 tm_shape(ausserberg_sf) +
   tm_bubbles(col = "Verbuschung",
              shape = "Vegetationstyp") +
-  {{tm_layout(legend.outside = TRUE)}}
+  tm_layout(legend.outside = TRUE)
   
 ```
 ]
@@ -399,7 +441,7 @@ tm_shape(ausserberg_sf) +
              shape = "Vegetationstyp") +
   tm_layout(legend.outside = TRUE,
             legend.position = c("right","bottom")) +
-  {{tm_grid(labels.rot = c(90, 0), lines = FALSE)}}
+  tm_grid(labels.rot = c(90, 0), lines = FALSE)
   
 ```
 ]
@@ -415,7 +457,7 @@ knitr::include_graphics(knitr::fig_chunk("tmap7", "png"))
 ---
 layout: false
 
-## Übung 1.9 <!--7-->
+## Übung 1.10 <!--7-->
 
 Erstellt nun eine eigene Karte mit `tmap` und euren Daten. Versucht, den unten stehenden Plot zu rekonstruieren (oder probiert was eigenes). 
 
@@ -441,21 +483,48 @@ tm_shape(ausserberg_sf) +
 
 
 ---
+class: highlight-last-item
 
 ## Input <!--4-->
 
-- In der vorherigen Übung haben wir unserem Datensatz ein Koordinatensystem *zugewiesen*. 
-- Manchmal müssen wir aber Koordinaten vom einen Koordinantensystem *transformieren*. 
-- Es ist wichtig, dass man diese beiden Operationen unterscheidet
-  - *zuweisen* verändert die Koordinatenwerte *nicht*, und ist nur sinnvoll, wenn das Koordinatensystem nicht oder falsch zugewiesen wurde
-  - *transformieren* verändert die Koordinatenwerte und ist unter verschiedenen Szenarien sinnvoll (um die Daten mit anderen zu integrieren oder um die Vorzüge des Zielkoordinatensystems zu nutzen)
+- Bisher: Dem Datensatz ein Koordinatensystem *zuweisen*. 
+
+--
+- Auch häufig: Koordinaten vom einen Koordinantensystem in ein anderes übersetzen (*transformieren*)
+
+--
+- Wichtig unterschied!
+
+--
+- Koordinatenbezugssystem *zuweisen* 
+
+--
+  - verändert die Koordinatenwerte *nicht*, 
+
+--
+  - ist nur sinnvoll, wenn das Koordinatensystem nicht oder falsch zugewiesen wurde
+  
+--
+- Koordinatenbezugssystem*transformieren* 
+
+--
+  - verändert die Koordinatenwerte 
+  
+--
+  - ist unter verschiedenen Szenarien sinnvoll (um versch. Datequellen zu integrieren)
 
 
 ---
 
-## Übung 1.10 <!--3-->
+## Übung 1.11 <!--3-->
 
-Transformiert `ausserberg_sf` in das Koordinatenbezugssystem WGS84 und speichert den output in einer neuen Variabel (z.B `ausserberg_sf_wgs84`). Schaut euch diesen Datensatz an, was hat sich verändert?
+- Transformiert `ausserberg_sf` in das Koordinatenbezugssystem WGS84
+- Speichert den output in einer neuen Variabel (z.B `ausserberg_sf_wgs84`)
+- Schaut euch diesen Datensatz an, was hat sich verändert?
+
+--
+- Tipp: Nutzt dafür die Funktion `st_transform()`
+
 
 --
 
@@ -476,12 +545,12 @@ Bounding box:  xmin: 7.843394 ymin: 46.3183 xmax: 7.847758 ymax: 46.32055
 Zudem haben sich die Koordinatenwerte verändert. Neu: `POINT (7.843859 46.31987)`
 
 ---
+exclude: true
 
-## Übung 1.10 <!--4-->
+## Übung 1.12 <!--4-->
 
 Wiederhole nochmal den letzten `tmap` plot , diesmal mit dem Datensatz `ausserberg_sf_wgs84`. Wie unterscheiden sich die Plots? 
 
---
 
 ## Lösung
 
@@ -529,7 +598,7 @@ tm_shape(ausserberg_sf_wgs84) +
 --
 
 ```{r}
-write_sf(ausserberg_sf, "_data/ausserberg.gpkg")
+write_sf(ausserberg_sf, "_data/processed/ausserberg.gpkg")
 ```
 
 
@@ -538,14 +607,14 @@ write_sf(ausserberg_sf, "_data/ausserberg.gpkg")
 Beim Einlesen von `ausserberg.gpkg` ist R nun sofort klar, dass es sich um Punktdaten im Koordinatenbezugssystem `EPSG 2056` handelt. 
 
 ```{r}
-ausserberg_sf <- read_sf("_data/ausserberg.gpkg")
+ausserberg_sf <- read_sf("_data/processed/ausserberg.gpkg")
 ```
 
 
 
 ---
 
-## Übung 1.11 <!--15-->
+## Übung 1.13 <!--15-->
 
 - Importiere nun aus dem Excel Hagenmoos.xlsx das Datenblatt `KopfdatenVertikal` als `data.frame`. 
 - Konvertiere den Dataframe in ein `sf` objekt 
@@ -558,7 +627,7 @@ ausserberg_sf <- read_sf("_data/ausserberg.gpkg")
 ## Lösung
 
 ```{r}
-hangenmoos <- readxl::read_excel("_data/daten_vegedaz/Hagenmoos.xlsx", "KopfdatenVertikal")
+hangenmoos <- readxl::read_excel("_data/original/daten_vegedaz/Hagenmoos.xlsx", "KopfdatenVertikal")
 
 hangenmoos_sf <- st_as_sf(hangenmoos, coords = c("X", "Y"))
 st_crs(hangenmoos_sf) <- 21781
@@ -580,8 +649,14 @@ tm_shape(hangenmoos_sf_wgs84) +
 ## Input <!--3-->
 
 - Der Datensatz `Hangenmoos` beinhaltet Erhebungen an den gleichen Standorten in verschiedenen Jahren. 
+
+--
 - Dies führt dazu, dass sich Punkte überlagern (gleiche Koordinaten)
+
+--
 - Um dies zu vermeiden, können wir mit der `facet` option in `tmap` arbeiten
+
+--
 
 ```{r, fig.height=4, fig.width=7}
 tm_shape(hangenmoos_sf_wgs84) +
@@ -590,9 +665,30 @@ tm_shape(hangenmoos_sf_wgs84) +
  {{tm_facets("Jahr",nrow = 1)}}
 ```
 
+---
+
+## Aufgabe 1.14 <!--3-->
+
+
 - Bisher haben wir nur statische Karten (ohne Hintergrundkarte) erstellt. 
-  - Mit `tmap` lassen sich aber auch sehr leicht interaktive Karten erstellen
-  - Setze dafür `tmap_mode("view")` und führe dein letzter Code für die Erstellung eines tmap-Plots nochmals aus
+
+--
+- Mit `tmap` lassen sich aber auch sehr leicht interaktive Karten erstellen
+  
+--
+- Setze dafür `tmap_mode("view")` und führe dein letzter Code für die Erstellung eines tmap-Plots nochmals aus
+  
+
+---
+
+## Lösung
+
+```{r, message = FALSE}
+tmap_mode("view")
+
+tm_shape(hangenmoos_sf_wgs84) +  tm_bubbles(col = "Bereich")  +  tm_layout(legend.outside = TRUE)
+```
+
 
 ---
 

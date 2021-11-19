@@ -1,6 +1,6 @@
 ---
 subtitle: "CAS FAB: Räumliche Daten in R"
-title: "Input: Rasterdaten in R"
+title: "Rasterdaten in R"
 author: "Nils Ratnaweera"
 institute: "Forschungsgruppe Geoinformatik"
 date: "`r Sys.Date()`"
@@ -31,7 +31,7 @@ xaringanExtra::style_share_again(share_buttons = "none")
 - Bisher haben wir nur mit Vektordaten in R gearbeitet
 - Vektordaten sind in `data.frames` integriert und deshalb einfach zu handhaben
 - Vektordaten decken aber nur das Entitätenmodell ab
-- Das Entitätenmodel ist für viele Anwendungsgebiete Ungeeignet
+- Das Entitätenmodel ist für viele Anwendungsgebiete ungeeignet
 ]
 
 
@@ -43,8 +43,8 @@ layout: true
 .pull-left[
 - Rasterdaten sind omnipräsent:
   - Daten aus Fernerkundung
-  - bei Kontinuierlichen (nicht Diskrete) Daten
-  - bei Flächendeckende Daten
+  - bei kontinuierlichen (nicht Diskrete) Daten
+  - bei flächendeckende Daten
 <!-- gibt es noch mehr situationen?-->
 - Rasterdaten sind umständlich
   - Tendentiell gross

@@ -7,7 +7,7 @@ library(terra)
 
 my_geopackage <- "_data/geopackage4.gpkg"
 
-relief <- terra::rast("_data/2mio_relief_color.tif")
+relief <- terra::rast("_data/original/2mio_relief_color.tif")
 
 db <- "PG:host=localhost dbname=swisstopo user=viewer password=viewer"
 

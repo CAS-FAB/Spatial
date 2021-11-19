@@ -1,12 +1,36 @@
 ---
-title: "CAS FAB: Räumliche Daten in R"
+title: "CAS Vegetationsanalyse"
 ---
 
-```{r, include=FALSE}
-source("functions.R", local = knitr::knit_global())
-```
+## Zeitplan
 
-```{r, echo = FALSE}
-aufwand("01_Einfuehrung")
-```
+| von     | bis     | Thema                                                  |
+|:------	|:------	|:------------------------------------------------------ |
+| 09:00 	| 09:05 	| Vorstellung & Zeitplan                	               |
+| 09:05 	| 09:30 	| [Input: Einführung räumliche Daten](Einfuehrung.html)  |
+| 09:30 	| 10:40 	| [Vektordaten](Vektordaten.html)        	               |
+| 10:50 	| 11:35 	| [Vektordaten (fortsetzung)](Vektordaten.html)          |
+| 12:00 	| 13:00 	| Mittagspause                          	               |
+| 13:00 	| 13:35 	| [Rasterdaten](Rasterdaten.html)       	               |
+| 13:50 	| 14:35 	| [Rasterdaten (Fortsetzung)](Rasterdaten.html)          |
+| 14:50 	| 15:35 	| [GIS "Layers"](Advanced.html)          	               |
+| 15:50 	| 16:35 	| [Samplin Design](Advanced.html)        	               |
+    
+
+
+
+## Wer bin ich?
+
+- https://www.zhaw.ch/en/about-us/person/rata/
+
+
+## Vorbereiten
+- packages installieren `tmap`, `sf`, `terra`
+- [Daten herunterladen](https://filesender.switch.ch/filesender2/?s=download&token=e3bf9c1a-e85a-4e17-9fcf-fea0a8938890):  (https://bit.ly/3kSTZFD)
+
+
+## RStudio Server
+- Freischalten: https://store-hslu.switchhub.ch/
+- Einloggen: https://rstudioforswitchhub.zhaw.ch
+
 

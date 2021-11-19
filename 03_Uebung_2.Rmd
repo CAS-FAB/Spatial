@@ -61,7 +61,7 @@ Importiere das den Datensatz mit `read_sf()` und speichere den output in der Var
 ## Lösung
 
 ```{r}
-gemeindegrenzen <- read_sf("_data/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_BEZIRKSGEBIET.shp")
+gemeindegrenzen <- read_sf("_data/original/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_BEZIRKSGEBIET.shp")
 ```
 
 
@@ -104,7 +104,22 @@ Visualisiere die Gemeindegrenzen mit `plot()` und `tmap`.
 ## Lösung
 
 ```{r, fig.height=4}
-tm_shape(gemeindegrenzen) + tm_polygons(col = "EINWOHNERZ")
+tm_shape(gemeindegrenzen) + tm_polygons()
+```
+
+
+---
+
+## Übung 2.6 <!--4-->
+
+Färbe die Polygone nach der Einwohnerzahl ein. Spiele mit der Option `style` herum.
+
+--
+
+## Lösung
+
+```{r, fig.height=4}
+tm_shape(gemeindegrenzen) + tm_polygons(col = "EINWOHNERZ", style = "cont")
 ```
 
 

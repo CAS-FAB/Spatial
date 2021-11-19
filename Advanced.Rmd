@@ -19,9 +19,9 @@ aufwand("08_Sampling_Design")
 ```
 
 
-### Komplexe Karten
+<!-- ### Komplexe Karten -->
 
 ```{r, echo = FALSE}
-aufwand("09_Advanced_Mapping")
+# aufwand("09_Advanced_Mapping")
 ```
 

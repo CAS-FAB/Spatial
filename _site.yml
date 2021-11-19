@@ -1,10 +1,12 @@
 name: "CAS FAB: Räumliche Daten in R"
-exclude: ["docs/"]
+
 navbar:
   title: "CAS FAB: Räumliche Daten in R"
   left:
-    - text: "Einführung"
+    - text: "Home"
       href: index.html
+    - text: "Einführung"
+      href: Einfuehrung.html
     - text: "Vektordaten"
       href: Vektordaten.html
     - text: "Rasterdaten"

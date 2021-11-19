@@ -143,7 +143,7 @@ install.packages("terra")
 ```{r}
 library(terra)
 
-dhm200 <- rast("_data/dhm25_200/DHM200.xyz")
+dhm200 <- rast("_data/original/dhm25_200/DHM200.xyz")
 ```
 
 - Aus `terra` benötigen wir die Funktion `rast`
@@ -213,7 +213,7 @@ Importiere `DHM200` in R und schau dir das Objekt in der Konsole sowie mit `plot
 
 
 ```{r, eval = FALSE}
-dhm200 <- rast("_data/dhm25_200/DHM200.xyz")
+dhm200 <- rast("_data/original/dhm25_200/DHM200.xyz")
 dhm200
 plot(dhm200)
 ```
@@ -225,9 +225,17 @@ layout: true
 ---
 
 - Das Koordinatenbezugssystem haben wir bereits für Vektordaten festgelegt
+
+--
 - dabei haben wir folgenden Befehl verwendet: 
-- `st_crs(meinvektordatensatz) <- 21781` <- für das alte Schweizer Koordinatenbezugssystem
+
+--
+- `st_crs(meinvektordatensatz) <- 21781` (&larr; für das alte Schweizer Koordinatenbezugssystem)
+
+--
 - für Rasterdaten funktioniert es leicht anders:
+
+--
 
 ```{r}
 crs(dhm200) <- "epsg: 21781"
@@ -236,6 +244,8 @@ crs(dhm200) <- "epsg: 21781"
 --
 
 - `crs()` statt `st_crs`
+
+--
 - `"epsg: 21781"` (mit Anführungs- und Schlusszeichen) statt `21781`
 
 ---
@@ -252,11 +262,21 @@ layout: true
 ## Input: Koordinatenbezugssystem *transformieren*
 
 ---
+class: highlight-last-item
 
-- Das Koordinatenbezugssystem von `dhm200` ist das alte Schweizer Koordinatenbezugssytem (`CH1903 LV03` bzw. `EPSG: 21781`)
-- Analog den Vektordaten sollten wir es in das *neue* Schweizer Koordinatenbezugssytem transformieren
-- Für Vektordaten haben wir dafür den Befehl `st_transform` verwendet
-- Die Analoge Funktion für Rasterdaten lautet `project`
+--
+- Koordinatenbezugssystem von `dhm200`: `CH1903 LV03` bzw. `EPSG: 21781`
+
+--
+- Analog Vektordaten: in das *neue* Schweizer Koordinatenbezugssytem transformieren
+
+--
+- Vektordaten: Funktion `st_transform`
+
+--
+- Rasterdaten: Funktion `project`
+
+--
 
 ```{r}
 dhm200_2056 <- project(dhm200, "epsg: 2056")
@@ -264,10 +284,13 @@ dhm200_2056 <- project(dhm200, "epsg: 2056")
 
 ---
 
+--
+
 ```{r, highlight.output=c(5)}
 dhm200
 ```
 
+--
 
 ```{r, highlight.output=c(5)}
 dhm200_2056
@@ -279,7 +302,8 @@ layout: false
 
 ## Übung 3.4 <!--4-->
 
-Transformiere `dhm200` in das Koordinatenbezugssystem `CH1903 LV95`. Speichere den Output als `dhm200_2056`.
+- Transformiere `dhm200` in das Koordinatenbezugssystem `CH1903+ LV95`
+- Speichere den Output als `dhm200_2056`
 
 --
 
@@ -324,7 +348,7 @@ Verändere die Darstellungsweise des Rasters mithilfe von `style` und `palette`.
 
 ## Lösung
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, fig.height=4.5}
 tm_shape(dhm200_2056) + tm_raster(style = "cont", palette = "viridis")
 ```
 
@@ -332,26 +356,40 @@ tm_shape(dhm200_2056) + tm_raster(style = "cont", palette = "viridis")
 
 ## Input <!--3-->
 
-- Wir haben für `DHM200.xyz` das Koordinatenbezugssystem festlegen und in das neue System transformieren müssen. 
+- Wir haben das DHM auf unsere Bedürfnisse angepasst (CRS gesetzt und transformiert)
 
 --
 
-- Wir können unser verändertes Objekt (`dhm200_2056`) nun so exportieren, so dass diese Änderungen abgespeichert werden
+- Wir können unser verändertes Objekt (`dhm200_2056`) exportieren, so dass diese Änderungen abgespeichert werden
 
 --
 
 ```{r}
-writeRaster(dhm200_2056,"_data/dhm200_2056.tif", overwrite = TRUE)
+writeRaster(dhm200_2056,"_data/processed/dhm200_2056.tif", overwrite = TRUE)
 ```
 
 --
 
-- beim Importieren ist nun R sofort klar, das es sich um ein Datensatz im neuen schweizer Koordinatenbezugssystem handelt (CRS setzen und transformieren ist nicht mehr nötig)
+- beim Import ist die CRS Information bekannt (CRS setzen und transformieren ist nicht mehr nötig)
 
 ```{r}
-dhm200_2056 <- rast("_data/dhm200_2056.tif")
+dhm200_2056 <- rast("_data/processed/dhm200_2056.tif")
 
 dhm200_2056
+```
+
+
+---
+## Übung 3.7 <!--4-->
+
+Exportiere `dhm200_2056` als `tif` File
+
+--
+
+## Lösung
+
+```{r, eval = FALSE}
+writeRaster(dhm200_2056,"_data/processed/dhm200_2056.tif")
 ```
 
 
@@ -384,7 +422,7 @@ Wir haben...
 - mit verschiedenen Darstellungformen in `tmap` gearbeitet (optionen `style` und `palette`)
 
 --
-- das Höhenmodell weist in jeder Zelle genau *einen* Wert auf (die Höhe). Es gibt aber Situationen, wo wir mehreren Werten pro Zelle benötigen
+- DHM: *ein* Wert pro Zelle. Es gibt aber Situationen, wo wir mehreren Werten pro Zelle benötigen
 
 
 

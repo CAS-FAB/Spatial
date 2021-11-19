@@ -31,10 +31,7 @@ R eignet sich hervorragend um ein Sampling Design umzusetzen
 
 ---
 
-Unser Sampling Design (2 Varianten):
-
-1. systematisch
-2. zufällig 
+## Ausgangslage
 
 
 ```{r, warning=FALSE, message=FALSE}
@@ -42,7 +39,7 @@ library(sf)
 library(terra)
 library(tmap)
 
-tww_landquart <- read_sf("_data/tww_landquart.gpkg")
+tww_landquart <- read_sf("_data/processed/tww_landquart.gpkg")
 ```
 
 
@@ -66,7 +63,7 @@ layout: true
 
 ```{r}
 tww_landquart$equal_samples <- 10
-sample_plots1 <- st_sample(tww_landquart, size = tww_landquart$equal_samples, by_polygon = TRUE)
+sample_plots1 <- st_sample(tww_landquart, size = tww_landquart$equal_samples)
 ```
 
 
@@ -113,7 +110,7 @@ knitr::kable(head(tww_landquart_polygon["Name"]))
 
 ```{r, warning=FALSE, echo = FALSE}
 tww_landquart_polygon$equal_samples <- 10
-sample_plots1b <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$equal_samples, by_polygon = TRUE)
+sample_plots1b <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$equal_samples)
 ```
 
 
@@ -131,7 +128,12 @@ base_plot +
 
 .pull-right[
 ```{r, echo = FALSE}
-base_plot +
+
+tww_landquart_polygon$i <- as.character(seq_len(nrow(tww_landquart_polygon)))
+
+tm_shape(tww_landquart_polygon, bbox = tww_landquart[tww_landquart$Name %in% c("Prafieb","Frättis", "Jerätsch"),]) + 
+  tm_polygons(col = "i") + 
+  tm_layout(legend.show = FALSE) +
   tm_shape(sample_plots1b) +
   tm_dots(shape = 3) +
   tm_layout(title = "10 samples pro Polygon")
@@ -166,7 +168,7 @@ knitr::kable(head(tww_landquart_polygon[,c("Name","SHAPE_Area", "relative_sample
 
 
 ```{r}
-sample_plots2 <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples, by_polygon = TRUE)
+sample_plots2 <- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples)
 ```
 
 ---
@@ -196,5 +198,21 @@ base_plot +
   tm_shape(sample_plots3) +
   tm_dots(shape = 3)
 ```
+
+---
+
+## Übung (Open End, ohne Musterlösung)
+
+- Wähle einen kleineren Kanton oder eine Gemeinde aus
+- Selektiere die TWW Standorte dieser Gemeinde / dieses Kantons
+- Wähle ein sinnvolles Sampling Design und setze es mit R um
+- Extrahiere die Höhenwerte für jeden Sample
+- Visualisere in einer Karte:
+  - die TWW Flächen
+  - Gemeinde- / Kantonsgrenze
+  - Sampling Standorte
+  - Swissimage Hintergrund Karte
+  - Nordpfeil, Scalebar
+
 
 
