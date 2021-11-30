@@ -4,7 +4,7 @@
     <title>Sampling Design mit R</title>
     <meta charset="utf-8" />
     <meta name="author" content="Nils Ratnaweera" />
-    <meta name="date" content="2021-11-18" />
+    <meta name="date" content="2021-11-30" />
     <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
     <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 ## CAS FAB: Räumliche Daten in R
 ### Nils Ratnaweera
 ### Forschungsgruppe Geoinformatik
-### 2021-11-18
+### 2021-11-30
 
 ---
 
@@ -49,10 +49,7 @@ R eignet sich hervorragend um ein Sampling Design umzusetzen
 
 ---
 
-Unser Sampling Design (2 Varianten):
-
-1. systematisch
-2. zufällig 
+## Ausgangslage
 
 
 
@@ -60,8 +57,9 @@ Unser Sampling Design (2 Varianten):
 library(sf)
 library(terra)
 library(tmap)
+tmap_mode("plot")
 
-tww_landquart &lt;- read_sf("_data/tww_landquart.gpkg")
+tww_landquart &lt;- read_sf("_data/processed/tww_landquart.gpkg")
 ```
 
 
@@ -82,7 +80,7 @@ layout: true
 
 ```r
 tww_landquart$equal_samples &lt;- 10
-sample_plots1 &lt;- st_sample(tww_landquart, size = tww_landquart$equal_samples, by_polygon = TRUE)
+sample_plots1 &lt;- st_sample(tww_landquart, size = tww_landquart$equal_samples)
 ```
 
 
@@ -184,7 +182,7 @@ tww_landquart_polygon$relative_samples &lt;- as.integer(round(tww_landquart_poly
 
 
 ```r
-sample_plots2 &lt;- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples, by_polygon = TRUE)
+sample_plots2 &lt;- st_sample(tww_landquart_polygon, size = tww_landquart_polygon$relative_samples)
 ```
 
 ---
@@ -207,6 +205,22 @@ sample_plots3 &lt;- st_sample(tww_landquart, size = 200, type = "regular")
 --
 
 ![](08_Sampling_Design_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+
+---
+
+## Übung (Open End, ohne Musterlösung)
+
+- Wähle einen kleineren Kanton oder eine Gemeinde aus
+- Selektiere die TWW Standorte dieser Gemeinde / dieses Kantons
+- Wähle ein sinnvolles Sampling Design und setze es mit R um
+- Extrahiere die Höhenwerte für jeden Sample
+- Visualisere in einer Karte:
+  - die TWW Flächen
+  - Gemeinde- / Kantonsgrenze
+  - Sampling Standorte
+  - Swissimage Hintergrund Karte
+  - Nordpfeil, Scalebar
+
 
 
     </textarea>

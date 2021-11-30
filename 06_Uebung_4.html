@@ -4,7 +4,7 @@
     <title>Übung 4: Komplexe Rasterdaten</title>
     <meta charset="utf-8" />
     <meta name="author" content="Nils Ratnaweera" />
-    <meta name="date" content="2021-11-18" />
+    <meta name="date" content="2021-11-30" />
     <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
     <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -23,7 +23,7 @@ class: center, middle, inverse, title-slide
 ## CAS FAB: Räumliche Daten in R
 ### Nils Ratnaweera
 ### Forschungsgruppe Geoinformatik
-### 2021-11-18
+### 2021-11-30
 
 ---
 
@@ -80,8 +80,11 @@ class: center, middle, inverse, title-slide
 2. räumliche Auflösung: 25m
 
 ---
+layout: true
 
 ## Übung 4.2 &lt;!-- 3--&gt;
+
+---
 
 - Erstelle ein neues R Script mit dem Namen `Uebung_4.R` 
 - Lade die libraries `sf`, `tmap` und `terra`. 
@@ -98,17 +101,8 @@ library(sf)
 library(tmap)
 library(terra)
 
-swissimage &lt;- rast("_data/swissimage25/SWISSIMAGE25m/SI25-2012-2013-2014.tif")
-```
+swissimage &lt;- rast("_data/original/swissimage25/SWISSIMAGE25m/SI25-2012-2013-2014.tif")
 
-```
-## Warning in new_CppObject_xp(fields$.module, fields$.pointer, ...): GDAL
-## Message 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```r
 crs(swissimage) &lt;- "epsg: 2056"
 ```
 
@@ -118,18 +112,6 @@ crs(swissimage) &lt;- "epsg: 2056"
 
 ```r
 plot(swissimage)
-```
-
-```
-## Warning in x@ptr$sampleRegularRaster(size): GDAL Message 1: /home/nils/
-## ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/SWISSIMAGE25m/
-## SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$sampleRegularRaster(size): GDAL Message 1:
-## TIFFFetchNormalTag:Incompatible type for "RichTIFFIPTC"; tag ignored
 ```
 
 ![](06_Uebung_4_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
@@ -153,16 +135,34 @@ swissimage
 ## names       : SI2_1, SI2_2, SI2_3
 ```
 
----
-class: highlight-last-item
 
-## Input: Seltsamer bug mit `tmap`  &lt;!-- 3--&gt;
+---
+layout: false
+
+## Input: RGB Plots mit `tmap`
 
 --
 - Um ein `rgb` Datensatz mit `tmap` zu plotten, verwenden wir nicht mehr `tm_raster()` sondern `tm_rgb`
 
 --
-- `tm_shape(swissimage) + tm_rgb()`
+
+
+
+
+
+```r
+tm_shape(swissimage) + 
+  tm_rgb()
+```
+
+![](06_Uebung_4_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
+
+
+---
+class: highlight-last-item
+
+## Input: Seltsamer bug mit `tmap`  &lt;!-- 3--&gt;
 
 --
 - Obwohl wir das Koordinatenbezugssystem korrekt gesetzt haben, kann `tmap` diese nicht interpretieren
@@ -183,67 +183,6 @@ class: highlight-last-item
 swissimage &lt;- project(swissimage, "epsg: 2056")
 ```
 
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message
-## 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message
-## 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message 1:
-## TIFFFetchNormalTag:Incompatible type for "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message
-## 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message 1:
-## TIFFFetchNormalTag:Incompatible type for "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message
-## 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message 1:
-## TIFFFetchNormalTag:Incompatible type for "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message
-## 1: /home/nils/ownCloud/Lehre/CAS_Vegtationsanalyse/_data/swissimage25/
-## SWISSIMAGE25m/SI25-2012-2013-2014.tif: TIFFFetchNormalTag:Incompatible type for
-## "RichTIFFIPTC"; tag ignored
-```
-
-```
-## Warning in x@ptr$warp(SpatRaster$new(), y, method, mask, opt): GDAL Message 1:
-## TIFFFetchNormalTag:Incompatible type for "RichTIFFIPTC"; tag ignored
-```
-
---
-- Damit wir diese Änderungen speichern können, exportiere ich `swissimage` als neues `tif`-File
-
-```r
-terra::writeRaster(swissimage, "_data/swissimage.tif", overwrite = TRUE)
-```
-
-
 
 ---
 
@@ -256,49 +195,153 @@ tm_shape(swissimage) +
 ```
 
 ```
-## Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
-## prefer_proj): Discarded datum CH1903+ in Proj4 definition
-```
-
-```
 ## stars_proxy object shown at 1216 by 823 cells.
 ```
 
-![](06_Uebung_4_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+![](06_Uebung_4_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
+
+---
+
+## Übung 4.3
+
+Exportiert `swissimage` als `tif`-File
+
+--
+
+## Lösung
+
+
+```r
+terra::writeRaster(swissimage, "_data/processed/swissimage.tif", overwrite = TRUE)
+```
+
+
 
 ---
 
 ## Input
 
 --
-- In einer vorangegangenen Übung haben wir das Höhenmodell `dhm200` importiert
+- Heute haben wir das Höhenmodell `dhm200` importiert
 
 --
-- dabei handelt es sich um ein Höhenmodell mit 200m Auflösung
+- Höhenmodell mit 200m Auflösung (&amp;rarr; grob! )
 
--- 
-- diese ist in vielen Fällen ausreichend, kann aber auch zu grob sein
-
--- 
+--
 - swisstopo stellt zusätzlich das [`dhm25`](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html) mit 25m Auflösung zur Verfügung (https://bit.ly/3kFgZrF)
 
 --
 - durch die höhere Auflösung dauert das transformieren in ein neues Koordinatensystem etwas länger
 
---
-- in solchen Situationen verwende ich 2 Tricks
+
+---
+
+## Übung 4.4
+
+- Ladet euch das das [`dhm25`](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html) mit 25m Auflösung herunter (https://bit.ly/3kFgZrF)
+- importiert es in R
+- setzt das korrekte CRS
+- transformiert es in EPSG 2056 und verwendet dabei folgende Optionen: 
   - mit `filename =` den Output direkt in ein File speichern
   - mit `progress = TRUE` den Fortschritt anzeigen lassen
+- visualisiert es mit `tmap`
+
+--
+
+## Lösung
 
 
 ```r
-dhm25 &lt;- rast("_data/DHM25_MM_ASCII_GRID/ASCII_GRID_1part/dhm25_grid_raster.asc")
+dhm25 &lt;- rast("_data/original/DHM25_MM_ASCII_GRID/ASCII_GRID_1part/dhm25_grid_raster.asc")
 crs(dhm25) &lt;- "epsg: 21781"
 
 terra::project(dhm25, "epsg: 2056", filename = "_data/dhm25_2056.tif", progress = TRUE)
 ```
 
 
+---
+
+## Übung 4.5 (Optional und Open End)
+
+Suche dir auf den gängigen Portalen (s.u.) einen spannenden Datensatz und visualisiere diesen
+  - [opendata.swiss](https://opendata.swiss/)
+  - [map.geo.admin.ch](https://map.geo.admin.ch)
+  - [swisstopo.admin.ch](https://www.swisstopo.admin.ch)
+  
+---
+
+## Übung 4.6 (Optional und Open End)
+
+- Lade dir swissimage daten in der Auflösung von 2m herunter und importiere sie in `R`
+- Achtung! Sehr anspruchsvoll!!
+- Tipps: du brauchst dazu:
+  - `list.files()`
+  - `lapply`
+  - `do.call`
+  - `mosaic`
+
+---
+
+## Lösung
+
+Daten herunterladen:
+
+
+```r
+links &lt;- read.csv("_data/original/swissimage_2m_landquart/swissimage_2m_urls.csv",header = FALSE)
+
+links &lt;- links$V1
+
+filenames &lt;- basename(links)
+
+for (i in seq_along(links)) {
+  download.file(links[i], file.path("_data/original/swissimage_2m_landquart/", filenames[i]))
+}
+```
+
+Daten importieren:
+
+
+```r
+swissimage_paths &lt;- list.files("_data/original/swissimage_2m_landquart",full.names = TRUE)
+
+swissimage_list &lt;- lapply(swissimage_paths, function(x){rast(x)})
+
+swiss_mosaic &lt;- do.call(terra::mosaic, swissimage_list)
+
+writeRaster(swiss_mosaic, "_data/processed/swissimage_2m_landquart.tif", overwrite = TRUE)
+```
+
+---
+exclude: true
+
+## Übung 4.7 
+
+
+
+
+```r
+tww_landquart &lt;- read_sf("_data/processed/tww_landquart.gpkg")
+
+swissimage &lt;- terra::rast("_data/processed/swissimage_2m_landquart.tif")
+
+tm_shape(swissimage) +
+  tm_rgb() +
+  tm_shape(tww_landquart, is.master = TRUE) +
+  tm_polygons() +
+  tm_scale_bar(position = c(1,0), just = c(1,0),bg.color = "white")
+```
+
+```
+## Warning in showSRID(SRS_string, format = "PROJ", multiline = "NO", prefer_proj =
+## prefer_proj): Discarded datum CH1903+ in Proj4 definition
+```
+
+```
+## stars object downsampled to 1000 by 1000 cells. See tm_shape manual (argument raster.downsample)
+```
+
+![](06_Uebung_4_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
 
 
     </textarea>

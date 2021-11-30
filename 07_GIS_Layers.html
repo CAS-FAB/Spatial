@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="" xml:lang="">
   <head>
-    <title>GIS Layer Prinzip</title>
+    <title>Integration von Geodaten</title>
     <meta charset="utf-8" />
     <meta name="author" content="Nils Ratnaweera" />
-    <meta name="date" content="2021-11-18" />
+    <meta name="date" content="2021-11-30" />
     <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
     <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -19,11 +19,11 @@
     <textarea id="source">
 class: center, middle, inverse, title-slide
 
-# GIS Layer Prinzip
+# Integration von Geodaten
 ## CAS FAB: Räumliche Daten in R
 ### Nils Ratnaweera
 ### Forschungsgruppe Geoinformatik
-### 2021-11-18
+### 2021-11-30
 
 ---
 
@@ -40,26 +40,35 @@ class: highlight-last-item
 --shareagain-reddit: none;
 }</style>
 
-## GIS Layer Prinzip
+## Integration von Geodaten
 
 - Bisher haben wir alle Datensätze einzeln betrachtet
 
 --
-- Wenn wir alle Datensätze ins gleiche Bezugssystem bringen, können wir diese *überlagern*
+- Wenn wir alle Datensätze ins gleiche Bezugssystem bringen, können wir diese *integrieren* bzw. überlagern
 
 --
 - Überlagern kann heissen: 
 
 --
-  - gemeinsam visualisieren
+  - gemeinsam Visualisieren
   
 --
   - Information übertragen
 
   
+---
+
+## Übung 5.1
+
+- Starte ein neues Script `Uebung_5.R`
+- Importiere darin alle räumlichen libraries
+- Importiere die Datensätze `ausserberg.gpkg` (aus Übung 2) sowie `dhm200_2056.tif` (aus Übung 3)
+  - im Zip File: `_data/processed/ausserberg.gpkg` bzw. `_data/processed/dhm200_2056.tif`
+
 --
 
-**Ausgangslage:**
+## Lösung
 
 
 ```r
@@ -67,18 +76,21 @@ library(sf)
 library(terra)
 library(tmap)
 
-ausserberg &lt;- read_sf("_data/ausserberg.gpkg")
-dhm200 &lt;- rast("_data/dhm200_2056.tif")
+ausserberg &lt;- read_sf("_data/processed/ausserberg.gpkg")
+dhm200 &lt;- rast("_data/processed/dhm200_2056.tif")
 ```
 
 ---
 
-## Visuelle Überlagerung
+## Übung 5.2
 
-Visuelle Überlagerung mit `+` in `tmap`
+Überlagere die beiden Datensätze in einem `tmap`-Plot, indem du diese mit `+` verkettest.
+
+---
+
+## Lösung
 
 
-.pull-left[
 
 ```r
 tm_shape(dhm200) + 
@@ -86,30 +98,29 @@ tm_shape(dhm200) +
   tm_shape(ausserberg) + 
   tm_dots()
 ```
-]
+
+![](07_GIS_Layers_files/figure-html/tmap11-1.png)&lt;!-- --&gt;
 
 --
 
-.pull-right[
-&lt;img src="07_GIS_Layers_files/figure-html/tmap1-1.png" width="672" /&gt;
-]
-
---
 - da das `dhm200` die ganze Schweiz abdeckt, sind unsere Punkte kaum erkennbar.
 
 --
 - Lösung: raster mittels unseren Punktdaten "zuschneiden" (`crop`)
 
 ---
-layout: true
+layout: false
 
-## Raster zuschneiden
+## Übung 5.3
 
----
+- Mit `crop()` können wir ein Raster auf den "extent" von einem Vektor Datensatz zuschneiden
+- Schneide `dhm200` auf den extent von `ausserberg` zu
+- Visualisiere das resultierende Raster mit `tmap` (wieder gemeinsam mit `ausserberg`)
 
-Verschnitt von einem Raster mit `crop()`
+--
 
-.pull-left[
+## Lösung
+
 
 ```r
 dhm200_cropped &lt;- terra::crop(dhm200, ausserberg)
@@ -120,36 +131,38 @@ tm_shape(dhm200_cropped) +
   tm_dots() +
   tm_layout(legend.outside = TRUE)
 ```
-]
 
---
+![](07_GIS_Layers_files/figure-html/tmap2-1.png)&lt;!-- --&gt;
 
-.pull-right[
-&lt;img src="07_GIS_Layers_files/figure-html/tmap2-1.png" width="672" /&gt;
-]
+
+
+---
+
+## Übung 5.4
 
 --
 - die Auflösung des Raster Datensatzes ist zu grob!!
 
 --
-- Lösung: Hoch aufgelöster Datensatz herunterladen und einlesen ([dhm25](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html), https://bit.ly/3kFgZrF)
+- Lösung: Hoch aufgelöster Datensatz `dhm25` (aus Übung 4) und einlesen (zip-File: `processed/dhm25_2056.tif`)
 
+--
+- wiederhole das Zuschneiden mittels `crop` sowie das Visualisieren mittels `tmap`
 
----
+--
 
-Das `dhm25` verfügt im gegensatz zum `dhm200` über eine Zellgrösse von 25m
+## Lösung
 
 
 ```r
-dhm25 &lt;- rast("_data/dhm25_2056.tif") # bereits transformierter raster aus vorheriger Übung
-
+dhm25 &lt;- rast("_data/processed/dhm25_2056.tif") 
 dhm25_crop &lt;- crop(dhm25, ausserberg)           
 ```
 
 
---
+---
 
-.pull-left[
+
 
 ```r
 tm_shape(dhm25_crop) + 
@@ -157,38 +170,59 @@ tm_shape(dhm25_crop) +
   tm_shape(ausserberg) + 
   tm_dots()
 ```
-]
 
---
-
-.pull-right[
-&lt;img src="07_GIS_Layers_files/figure-html/tmap3-1.png" width="672" /&gt;
-]
+![](07_GIS_Layers_files/figure-html/tmap3-1.png)&lt;!-- --&gt;
 
 
 
 
 
 ---
-layout: true
+layout: false
+class: highlight-last-item
 
 ## Rasterwerte extrahieren
 
-
----
-class: highlight-last-item
 
 - bisher haben wir zwei Datensätze (Raster und Vektor) visuell überlagert
 
 --
 - nächster Schritt: **Information** von Raster &amp;rarr; Punkt Datensatz übertragen
 
+--
+- dazu müssen wir `ausserberg` von einem `sp`- in ein `SpatVector` Objekt konvertieren
+
+--
+- danach können wir das `SpatVector` Objekt gemeinsam mit `extract` verwenden
+
 ---
+
+## Übung 5.5
+
+- Wandle `ausserberg` mit der Funktion `vect()` in ein `SpatVector` Objekt und speichere es als `ausserberg_vect`
+- Schau dir `ausserberg_vect` an, was hat sich verändert?
+- Verwende die Funktion `extract` mit `ausserberg_vect` um die Höhenwerte aus `dhm25` zu extrahieren
+- Speichere den output in einer Variabel und beguteachte diese
+
+
+--
+
+## Lösung
+
 
 
 ```r
-elev &lt;- extract(dhm25, vect(ausserberg)) # &lt;- die Funktion extract() extrahiert die Information
+ausserberg_vect &lt;- vect(ausserberg)
+elev &lt;- extract(dhm25, ausserberg_vect) # &lt;- die Funktion extract() extrahiert die Information
+```
 
+---
+
+## Lösung
+
+
+
+```r
 elev                                     # &lt;- der output ist eine data.frame mit 2 Spalten
 ```
 
@@ -211,96 +245,139 @@ elev                                     # &lt;- der output ist eine data.frame 
 ## 15 15          1294.878
 ```
 
+---
+
+## Übung 5.6
+
+Spiele die Höheninformation aus `extract` zurück in `ausserberg`.
+
+
+--
+
+## Lösung
+
+
+
 ```r
 ausserberg$elevation &lt;- elev[,2]         # &lt;- die 2. Spalte aus elev auf ausserberg übertragen
 ```
 
 ---
 
+  ## Übung 5.7 
 
-```r
-head(ausserberg["elevation"])
-```
+Visualisiere nun `ausserberg` und Färbe die Punkte nach ihrer Höheninformation ein.
 
-```
-## Simple feature collection with 6 features and 1 field
-## Geometry type: POINT
-## Dimension:     XY
-## Bounding box:  xmin: 2631175 ymin: 1129752 xmax: 2631510 ymax: 1129969
-## Projected CRS: CH1903+ / LV95
-## # A tibble: 6 × 2
-##   elevation              geom
-##       &lt;dbl&gt;       &lt;POINT [m]&gt;
-## 1     1307. (2631210 1129910)
-## 2     1269. (2631175 1129752)
-## 3     1284. (2631411 1129900)
-## 4     1292. (2631377 1129922)
-## 5     1282. (2631324 1129816)
-## 6     1281. (2631510 1129969)
-```
 
----
+--
+
+## Lösung
 
 .pull-left[
 
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-8-1.png)&lt;!-- --&gt;
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-6-1.png)&lt;!-- --&gt;
 
 
 ]
 
 .pull-right[
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-7-1.png)&lt;!-- --&gt;
 
 ]
 
-???
-
-- vect() ist nötig, weil extract lieber ein SpatVector hätte als ein sf objekt
-
 ---
-layout: true
+layout: false
 
 ## Vektordaten zuschneiden
 
----
-
-Aufgabenstellung: 
-
-- wir verfügen über einen [TWW Datensatz der Schweiz](https://www.bafu.admin.ch/bafu/de/home/themen/biodiversitaet/zustand/karten/geodaten.html) (https://bit.ly/3CqNRKT)
-- wir verfügen über den [Gemeindelayer der Schweiz](https://data.geo.admin.ch/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/shp/2056/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill.zip) (https://bit.ly/3CaAj5W)
-- wir wollen alle TWW Flächen innerhalb der Gemeinde Landquart erhalten
+- nun wollen wir zwei Vektordatensätze miteinander verschneiden
+- Ausgangslage:
+  - wir verfügen über einen [TWW Datensatz der Schweiz](https://www.bafu.admin.ch/bafu/de/home/themen/biodiversitaet/zustand/karten/geodaten.html) (https://bit.ly/3CqNRKT)
+  - wir verfügen über den [Gemeindelayer der Schweiz](https://data.geo.admin.ch/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/shp/2056/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill.zip) (https://bit.ly/3CaAj5W)
+  - wir wollen alle TWW Flächen innerhalb der Gemeinde Landquart erhalten
 
 ---
+
+## Übung 5.8
+
+- Lade diese beiden Datensätze herunter und importiere sie in `R` (swissboundaries *Hoheitsgebiet*)
+- Transformiere sie in `ESPG 2056`
+
+
+--
+
+## Lösung
 
 
 ```r
 # Datensätze einlesen:
-tww &lt;- read_sf("_data/TWW/TWW_LV95/trockenwiesenweiden.shp")
-hoheitsgebiet &lt;- read_sf("_data/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_HOHEITSGEBIET.shp")
+tww &lt;- read_sf("_data/original/TWW/TWW_LV95/trockenwiesenweiden.shp")
+hoheitsgebiet &lt;- read_sf("_data/original/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/swissBOUNDARIES3D_1_3_TLM_HOHEITSGEBIET.shp")
 
 # Gemeindegrenzenen in EPSG 2056 transformieren und nur Landquart selektieren
 hoheitsgebiet &lt;- st_transform(hoheitsgebiet, 2056)
-landquart &lt;- hoheitsgebiet[hoheitsgebiet$NAME == "Landquart", ]
 ```
 
+---
 
-.pull-left[
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-11-1.png)&lt;!-- --&gt;
-]
+## Übung 5.9
 
-.pull-right[
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
+Erstelle ein neues Objekt `landquart`, welches nur die Gemeinde Landquart beinhaltet und visualisiere diese.
 
-]
+--
+
+## Lösung
+
+
+```r
+landquart &lt;- hoheitsgebiet[hoheitsgebiet$NAME == "Landquart", ]
+
+tm_shape(landquart) + 
+  tm_polygons() +
+  tm_layout(title = "Gemeinde Landquart")
+```
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-9-1.png)&lt;!-- --&gt;
 
 ---
+
+## Übung 5.10
+
+Überlagere die `TWW` Flächen mit der Gemeindegrenze von Landqart.
+
+--
+
+## Lösung
+
+
+
+```r
+tm_shape(tww) + 
+  tm_polygons() +
+  tm_layout(title = "TWW der Schweiz")  +
+  tm_shape(landquart) + 
+  tm_polygons(col = "red",border.col = "red")
+```
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-10-1.png)&lt;!-- --&gt;
+
+---
+
+## Übung 5.11
+
+- Verwende die Funktion `st_intersection()` um die TWW-Flächen auf die Gemeindegrenze von Landquart zu zuschneiden. 
+- Visualisiere das Resultat
+
+--
+
+## Lösung
 
 
 ```r
 tww_landquart &lt;- st_intersection(tww, landquart)
 ```
 
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-14-1.png)&lt;!-- --&gt;
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-12-1.png)&lt;!-- --&gt;
 
 
 ---
@@ -321,7 +398,7 @@ layout: true
 
 - Alternativ können wir alle TWW Flächen selektieren, die mindestens Teilweise innerhalb des Gemeindegebietes liegen
 
----
+--
 
 
 ```r
@@ -329,16 +406,47 @@ tww_landquart2 &lt;- tww[landquart, ]
 ```
 
 
+---
+layout: false
 
-![](07_GIS_Layers_files/figure-html/unnamed-chunk-16-1.png)&lt;!-- --&gt;
+## Übung 5.12 
+
+- Selektiere die TWW Flächen, welche sich zumindest Teilweise in der Gemeinde Landquart befinden und speichere den Output als `tww_landquart2`
+- Visualisiere das Resultat mit `tmap`
+- Vergleiche `tww_landquart2` mit `tww_landquart`. Wie unterscheiden sich diese?
+
+--
+
+## Lösung
+
+
+```r
+tww_landquart2 &lt;- tww[landquart, ]
+```
+
+
+![](07_GIS_Layers_files/figure-html/unnamed-chunk-15-1.png)&lt;!-- --&gt;
+
+---
+
+## Übung 5.13
+
+Exportiere `tww_landquart2` als Geopackage
+
+--
+
+## Lösung
 
 
 
+```r
+st_write(tww_landquart2, "_data/processed/tww_landquart.gpkg", delete_layer = TRUE)
+```
 
 ```
 ## Deleting layer `tww_landquart' using driver `GPKG'
 ## Writing layer `tww_landquart' to data source 
-##   `_data/tww_landquart.gpkg' using driver `GPKG'
+##   `_data/processed/tww_landquart.gpkg' using driver `GPKG'
 ## Writing 12 features with 12 fields and geometry type Multi Polygon.
 ```
 

@@ -11,7 +11,7 @@
 
 
 
-<title>CAS FAB: Räumliche Daten in R</title>
+<title>CAS Vegetationsanalyse</title>
 
 <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
 <script src="site_libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
@@ -32,7 +32,6 @@
 <script src="site_libs/navigation-1.1/tabsets.js"></script>
 <link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
 <script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
-<script src="site_libs/fitvids-2.1.1/fitvids.min.js"></script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -243,7 +242,10 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">Einführung</a>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Einfuehrung.html">Einführung</a>
 </li>
 <li>
   <a href="Vektordaten.html">Vektordaten</a>
@@ -266,16 +268,109 @@ $(document).ready(function () {
 
 
 
-<h1 class="title toc-ignore">CAS FAB: Räumliche Daten in R</h1>
+<h1 class="title toc-ignore">CAS Vegetationsanalyse</h1>
 
 </div>
 
 
-<div class="shareagain" style="min-width:300px;margin:1em auto;">
-<iframe src="01_Einfuehrung.html" width="1600" height="900" style="border:2px solid currentColor;" loading="lazy" allowfullscreen></iframe>
-<script>fitvids('.shareagain', {players: 'iframe'});</script>
+<div id="zeitplan" class="section level2">
+<h2>Zeitplan</h2>
+<table>
+<thead>
+<tr class="header">
+<th align="left">von</th>
+<th align="left">bis</th>
+<th align="left">Thema</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">09:00</td>
+<td align="left">09:05</td>
+<td align="left">Vorstellung &amp; Zeitplan</td>
+</tr>
+<tr class="even">
+<td align="left">09:05</td>
+<td align="left">09:30</td>
+<td align="left"><a href="Einfuehrung.html">Input: Einführung räumliche Daten</a></td>
+</tr>
+<tr class="odd">
+<td align="left">09:30</td>
+<td align="left">10:40</td>
+<td align="left"><a href="Vektordaten.html">Vektordaten</a></td>
+</tr>
+<tr class="even">
+<td align="left">10:50</td>
+<td align="left">11:35</td>
+<td align="left"><a href="Vektordaten.html">Vektordaten (fortsetzung)</a></td>
+</tr>
+<tr class="odd">
+<td align="left">12:00</td>
+<td align="left">13:00</td>
+<td align="left">Mittagspause</td>
+</tr>
+<tr class="even">
+<td align="left">13:00</td>
+<td align="left">13:35</td>
+<td align="left"><a href="Rasterdaten.html">Rasterdaten</a></td>
+</tr>
+<tr class="odd">
+<td align="left">13:50</td>
+<td align="left">14:35</td>
+<td align="left"><a href="Rasterdaten.html">Rasterdaten (Fortsetzung)</a></td>
+</tr>
+<tr class="even">
+<td align="left">14:50</td>
+<td align="left">15:35</td>
+<td align="left"><a href="Advanced.html">GIS “Layers”</a></td>
+</tr>
+<tr class="odd">
+<td align="left">15:50</td>
+<td align="left">16:35</td>
+<td align="left"><a href="Advanced.html">Samplin Design</a></td>
+</tr>
+</tbody>
+</table>
 </div>
-<p>Zeitlicher Aufwand: ca 0 Minuten</p>
+<div id="wer-bin-ich" class="section level2">
+<h2>Wer bin ich?</h2>
+<ul>
+<li><a href="https://www.zhaw.ch/en/about-us/person/rata/" class="uri">https://www.zhaw.ch/en/about-us/person/rata/</a></li>
+</ul>
+</div>
+<div id="vorbereiten" class="section level2">
+<h2>Vorbereiten</h2>
+<ul>
+<li>packages installieren <code>tmap</code>, <code>sf</code>, <code>terra</code></li>
+<li><a href="https://filesender.switch.ch/filesender2/?s=download&amp;token=e3bf9c1a-e85a-4e17-9fcf-fea0a8938890">Daten herunterladen</a>: (<a href="https://bit.ly/3kSTZFD" class="uri">https://bit.ly/3kSTZFD</a>)</li>
+</ul>
+</div>
+<div id="rstudio-server" class="section level2">
+<h2>RStudio Server</h2>
+<ul>
+<li>Freischalten: <a href="https://store-hslu.switchhub.ch/" class="uri">https://store-hslu.switchhub.ch/</a></li>
+<li>Einloggen: <a href="https://rstudioforswitchhub.zhaw.ch" class="uri">https://rstudioforswitchhub.zhaw.ch</a></li>
+</ul>
+</div>
+<div id="hilfe" class="section level2">
+<h2>Hilfe</h2>
+<ul>
+<li><a href="https://geocompr.robinlovelace.net/">GeocompR</a></li>
+<li><a href="https://rspatial.org/terra/index.html">Spatial Data Science with R and “terra”</a></li>
+</ul>
+</div>
+<div id="pdf-files-aller-slides" class="section level2">
+<h2>PDF Files aller Slides:</h2>
+<ul>
+<li><a href="01_Einfuehrung.pdf">Einfuehrung</a></li>
+<li><a href="02_Uebung_1.pdf">Uebung_1</a></li>
+<li><a href="04_Input_Raster.pdf">Input_Raster</a></li>
+<li><a href="05_Uebung_3.pdf">Uebung_3</a></li>
+<li><a href="06_Uebung_4.pdf">Uebung_4</a></li>
+<li><a href="07_GIS_Layers.pdf">GIS_Layers</a></li>
+<li><a href="08_Sampling_Design.pdf">Sampling_Design</a></li>
+</ul>
+</div>
 
 
 

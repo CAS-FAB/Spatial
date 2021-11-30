@@ -4,7 +4,7 @@
     <title>Das kleine GIS 1x1</title>
     <meta charset="utf-8" />
     <meta name="author" content="Nils Ratnaweera" />
-    <meta name="date" content="2021-11-18" />
+    <meta name="date" content="2021-11-30" />
     <script src="site_libs/header-attrs-2.11.2/header-attrs.js"></script>
     <link href="site_libs/remark-css-0.0.1/default.css" rel="stylesheet" />
     <link href="site_libs/remark-css-0.0.1/default-fonts.css" rel="stylesheet" />
@@ -23,9 +23,11 @@ class: center, middle, inverse, title-slide
 ## CAS FAB: Räumliche Daten in R
 ### Nils Ratnaweera
 ### Forschungsgruppe Geoinformatik
-### 2021-11-18
+### 2021-11-30
 
 ---
+
+layout: true
 
 <style>.shareagain-bar {
 --shareagain-foreground: rgb(255, 255, 255);
@@ -39,26 +41,7 @@ class: center, middle, inverse, title-slide
 }</style>
 
 
-&lt;iframe src="https://www.zhaw.ch/en/about-us/person/rata/" style="border:0px #ffffff none;" name="myiFrame" scrolling="yes" frameborder="1" marginheight="0px" marginwidth="0px" height="700px" width="100%" allowfullscreen&gt;&lt;/iframe&gt;
-
----
-
-## Tagesablauf
-
-- 09:00 - 09:05 Vorstellung &amp; Zeitplan
-- 09:05 - 09:40 Input: Einführung GIS
-- 09:50 - 10:35 Übung 1: Vektordaten in R
-- 10:50 - 11:35 Übung 1 &amp; 2: Vektordaten in R
-- 12:00 - 13:00 Mittagspause
-- 13:00 - 13:35 Input: Raster
-- 13:50 - 14:35 Übung 2: Raster
-- 14:50 - 15:35 Input: Sampling Design
-- 15:50 - 16:35 Übung 3: Sampling Design
-
----
-layout: true
-
-# Was sind räumliche Daten?
+# Was sind räumliche Daten? &lt;!--2--&gt;
 
 ---
 
@@ -98,50 +81,77 @@ Zelluläre Prozesse haben durchaus räumlichen Charakter
 Räumlich muss sich nicht immer auf unsere Erde beziehen!
 
 Infrarotaufnahmen von Titan, einem Saturn-Mond aus der Cassini-Huygens mission
----
 
+---
+class: highlight-last-item
+
+--
 - Räumliche Daten sind Daten mit einem *Raumbezug* 
+
+--
   - typischerweise handelt es sich um einen 2- oder 3-dimensionaler Raum
-  - engl: spatial data
-- *Geo*daten sind räumliche Daten mit Bezug zur Erde
-  - 2-, 3- oder 4-\* dimensionaler Raum
   
+--
+  - engl: spatial data
 
-\* Zeitliche Dimension
+--
+- *Geo*daten sind räumliche Daten mit Bezug zur Erde
+
+--
+  - 2-, 3- oder n- dimensionaler Raum
+
+--
+- Sie berücksichtigen Attribute (die Semantik) und ihre räumliche Information
+
+--
+- das "was" und das "wo"
+
+--
+- beide Aspekte können auf unterschiedliche Art und Weise beschrieben werden (konzeptionelle Raummodelle)
 
 
----
-layout: false
+???
 
-# Für eine Geodatenanalyse brauche ich
 
-* Ein __Modell__ zur Abbildung der Umwelt
-  * Konzeptionelle Datenmodelle: __Entitäten__ oder __Felder__
-* __Datenstrukturen__ zur Speicherung der Lage und Attribute
-  * Vektor (Punkte, Linien, Polygone) oder Raster
-  * jeweils mit den bekannten R Datentypen: character, numeric, vector
-  * mit einem Koordinatensystem (WGS84, CH1903+ LV95)
-* Räumliche __Beziehungen__ für die Analyse
-  * Geometrie (x,y,z)
-  * Topologie (räumliche Beziehungen zwischen Objekten)
+Semantik: Bedeutung, Inhalt (eines Wortes, Satzes oder Textes)
+
 
 ---
 layout: true
-# Konzeptionelle Raummodelle
+
+# Konzeptionelle Raummodelle &lt;!--5--&gt;
 
 ---
+class: highlight-last-item
 
-- Geodaten berücksichtigen Attribute (die Semantik) und ihre räumliche Information
-- das "was" und das "wo"
-- beide Aspekte können auf unterschiedliche Art und Weise beschrieben werden
+![](images/raster_vector.gif)
+
+
+--
 - **Entitäts-Modell**
+
+--
   - Der Raum ist mit *diskreten Objekten* bevölkert
+  
+--
   - jedes Objekt verfügt über ein oder mehrere Attribute
+  
+--
   - jedes Objekt hat einen bestimmte Geometrie (Punkt, Linie oder Polygon)
+  
+--
   - entspricht einem Vektor-Datenformat
+
+--
 - **Feld-Modell**
-  - Die zu untersuchende räumliche Eigenheit hat eine *kontinuierliche räumliche Existenz*
+
+--
+  - die räumliche Eigenheit hat eine *kontinuierliche räumliche Existenz*
+  
+--
   - jeder Punkt im Raum hat einen Wert
+  
+--
   - entspricht einem Raster-Datenformat
   
 
@@ -170,51 +180,53 @@ Skigebiet St Moritz:
 ---
 
 layout: true
-# Datenformat: Vector
+# Entitätenmodel: Vector Datenformat &lt;!--2--&gt;
+
+
+
 
 ---
 
 ## Punkte
 
-.pull-left[
+
 ```
    name                            geom
    &lt;chr&gt;                    &lt;POINT [m]&gt;
  1 Europa             (2782399 1150371)
- 2 Kulm               (2784447 1152572)
- 3 Badrutt's Palace   (2784380 1152371)
- 4 Monopol            (2784291 1152517)
- 5 Misani             (2785587 1153966)
- 6 Hotel Bären        (2784735 1152855)
 ```
-]
 
-.pull-right[
-![](images/hotels.jpg)
-]
+
+
+![](01_Einfuehrung_files/figure-html/unnamed-chunk-2-1.png)&lt;!-- --&gt;
+
+
+
 
 
 
 ---
 
-## Linien
+## Linien  &lt;!--2--&gt;
 
-.pull-lef[
+
 ```
   name                                                                        geom
   &lt;chr&gt;                                                      &lt;MULTILINESTRING [m]&gt;
 1 Via Nouva ((2785946 1153895, 2785913 1153864, 2785870 1153819, 2785812 1153755))
 ```
-]
 
 
-![:scale 30%](images/roads.jpg)
+![](01_Einfuehrung_files/figure-html/unnamed-chunk-3-1.png)&lt;!-- --&gt;
+
+
+
 
 
 
 ---
 
-## Polygone
+## Polygone  &lt;!--2--&gt;
 
 ```
   name                                                                           geom
@@ -222,12 +234,23 @@ layout: true
 1 Hafnerwald (((2787615 1149733, 2787620 1149732, 2787612 1149732, 2787615 1149733)))
 ```
 
-![:scale 30%](images/forest.jpg)
+
+![](01_Einfuehrung_files/figure-html/unnamed-chunk-4-1.png)&lt;!-- --&gt;
+
+
+---
+layout: false
+
+# Feldmodell: Raster Datenformat &lt;!--2--&gt;
+
+
+![](01_Einfuehrung_files/figure-html/unnamed-chunk-5-1.png)&lt;!-- --&gt;
+
 
 ---
 layout: true
 
-# Koordinatensysteme
+# Koordinatensysteme  &lt;!--4--&gt;
 
 ---
 
@@ -266,13 +289,15 @@ beide Koordinatenreferenzsysteme
 
 - sind nur auf die Schweiz und Liechtenstein anwendbar
 - sind in Meter zu verstehen
-- sind kartesische Koordinatensysteme ("die Erde ist Flach")
+- sind *projezierte Koordinatenreferenzsysteme*
 ]
 
 ---
+
+
 layout: true
 
-# Projektionen
+# Projektionen  &lt;!--4--&gt;
 
 ---
 
@@ -281,8 +306,9 @@ layout: true
 ]
 
 .pull-right[
-- die Form der Erde lässt nur mit Verzerrungen auf eine kartesisches Koordinatensytem zwingen ("Orangenschalen-Problematik")
-- diese Verzerrungen kann man räumlich minimieren. So entwickelten sich eine Vielzahl unterschiedliche Projektionen und Koordinatenreferenzsystem
+- die Form der Erde lässt nur mit Verzerrungen auf eine 2D Fläche zwingen ("Orangenschalen-Problematik")
+- diese Verzerrungen kann man räumlich minimieren
+- So entwickelten sich eine Vielzahl unterschiedliche Projektionen und Koordinatenreferenzsystem
 ]
 
 ---
@@ -306,7 +332,7 @@ das Koordinatenreferenzsystem der Schweiz verwendet eine *schiefachsige, winkelt
 ---
 layout: true
 
-# Geographische Koordinatensysteme
+# Geographische Koordinatensysteme  &lt;!--4--&gt;
 
 ---
 
@@ -316,15 +342,20 @@ layout: true
 ]
 
 .pull-right[
-- Projizierte Koordinatensysteme (wie `CH1903 LV95`) sind nur auf bestimmte Regionen anwendbar
-- Daneben gibt es *Geografische Koordinatensysteme*, welche Längen- und Breitengrade verwenden
-- Sind für globale Daten sinnvoll, für Lokale Anwendungen (kleines Untersuchungsgebiet) umständlich (Distanzen, Winkel und Flächen sind schwierig zu berechnen)
-- Auch diese unterliegen Modellen der Erde und sind somit nur Annäherungen (die Erde ist eine Kartoffel)
-- Es gibt verschiedene Geographische Koordinatensysteme, für uns relevant ist nur *WGS84*
+*Geografische Koordinatensysteme*:
+
+- verwenden Längen- und Breitengrade
+- sind für globale Daten sinnvoll
+- sind für kleinräumige Anwendungen umständlich 
+- unterliegen ebenfalls räumlichen ungenauigkeiten 
+- sind in einer Vielzahl verfügbar, für uns relevant ist v.a. *WGS84*
 ]
 
+???
 
-
+- Projizierte Koordinatensysteme (wie `CH1903 LV95`) sind nur auf bestimmte Regionen anwendbar
+(Distanzen, Winkel und Flächen sind schwierig zu berechnen)
+(die Erde ist eine Kartoffel)
 
 
     </textarea>
