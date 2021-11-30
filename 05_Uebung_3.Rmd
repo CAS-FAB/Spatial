@@ -39,7 +39,7 @@ library(tmap)
 
 ## Übung 3.1 <!--10-->
 
-- Such das digitale höhenmodell der Schweiz. 
+- Such das digitale Höhenmodell der Schweiz (200m Auflösung)
 - Auch hier kannst du die folgenden Adressen nutzen:
   - [opendata.swiss](https://opendata.swiss/)
   - [map.geo.admin.ch](https://map.geo.admin.ch)

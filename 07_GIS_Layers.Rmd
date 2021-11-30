@@ -17,10 +17,13 @@ output:
 ---
 class: highlight-last-item
 
-```{r share-again, echo=FALSE}
+```{r share-again, echo=FALSE, message=FALSE}
 xaringanExtra::use_share_again()
 xaringanExtra::style_share_again(share_buttons = "none")
+library(tmap)
+
 tmap_options(check.and.fix = TRUE)
+tmap_mode("plot")
 ```
 
 ## Integration von Geodaten
@@ -47,7 +50,7 @@ tmap_options(check.and.fix = TRUE)
 - Starte ein neues Script `Uebung_5.R`
 - Importiere darin alle räumlichen libraries
 - Importiere die Datensätze `ausserberg.gpkg` (aus Übung 2) sowie `dhm200_2056.tif` (aus Übung 3)
-
+  - im Zip File: `_data/processed/ausserberg.gpkg` bzw. `_data/processed/dhm200_2056.tif`
 
 --
 
@@ -110,19 +113,20 @@ tm_shape(dhm200_cropped) +
   tm_layout(legend.outside = TRUE)
 ```
 
---
-- die Auflösung des Raster Datensatzes ist zu grob!!
-
---
-- Lösung: Hoch aufgelöster Datensatz herunterladen und einlesen ([dhm25](https://www.swisstopo.admin.ch/de/geodata/height/dhm25.html), https://bit.ly/3kFgZrF)
 
 
 ---
 
-## Aufgabe 5.4
+## Übung 5.4
 
-- das `dhm25` verfügt im gegensatz zum `dhm200` über eine Zellgrösse von 25m
-- importiere nun `dhm25` und wiederhole das Zuschneiden mittels `crop` sowie das visualieren mittels `tmap`
+--
+- die Auflösung des Raster Datensatzes ist zu grob!!
+
+--
+- Lösung: Hoch aufgelöster Datensatz `dhm25` (aus Übung 4) und einlesen (zip-File: `processed/dhm25_2056.tif`)
+
+--
+- wiederhole das Zuschneiden mittels `crop` sowie das Visualisieren mittels `tmap`
 
 --
 
@@ -134,7 +138,7 @@ dhm25_crop <- crop(dhm25, ausserberg)
 ```
 
 
---
+---
 
 
 ```{r tmap3, fig.height=3.5, warning=FALSE, message = FALSE}
@@ -214,7 +218,7 @@ ausserberg$elevation <- elev[,2]         # <- die 2. Spalte aus elev auf ausserb
 
 ---
 
-## Übung 5.7 
+  ## Übung 5.7 
 
 Visualisiere nun `ausserberg` und Färbe die Punkte nach ihrer Höheninformation ein.
 
@@ -255,14 +259,18 @@ layout: false
   - wir verfügen über einen [TWW Datensatz der Schweiz](https://www.bafu.admin.ch/bafu/de/home/themen/biodiversitaet/zustand/karten/geodaten.html) (https://bit.ly/3CqNRKT)
   - wir verfügen über den [Gemeindelayer der Schweiz](https://data.geo.admin.ch/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill/shp/2056/ch.swisstopo.swissboundaries3d-gemeinde-flaeche.fill.zip) (https://bit.ly/3CaAj5W)
   - wir wollen alle TWW Flächen innerhalb der Gemeinde Landquart erhalten
-  
+
+---
+
 ## Übung 5.8
 
 - Lade diese beiden Datensätze herunter und importiere sie in `R` (swissboundaries *Hoheitsgebiet*)
 - Transformiere sie in `ESPG 2056`
 
 
----
+--
+
+## Lösung
 
 ```{r}
 # Datensätze einlesen:
@@ -277,13 +285,13 @@ hoheitsgebiet <- st_transform(hoheitsgebiet, 2056)
 
 ## Übung 5.9
 
-Erstelle ein neues Objekt `landquart`, welches nur die Gemeinde Landquart beinhaltet und visualiere diese.
+Erstelle ein neues Objekt `landquart`, welches nur die Gemeinde Landquart beinhaltet und visualisiere diese.
 
 --
 
 ## Lösung
 
-```{r}
+```{r, fig.height=4.5}
 landquart <- hoheitsgebiet[hoheitsgebiet$NAME == "Landquart", ]
 
 tm_shape(landquart) + 
@@ -302,7 +310,7 @@ tm_shape(landquart) +
 ## Lösung
 
 
-```{r, echo = FALSE, warning=FALSE, fig.height=3.5}
+```{r, echo = TRUE, warning=FALSE, fig.height=3.5}
 tm_shape(tww) + 
   tm_polygons() +
   tm_layout(title = "TWW der Schweiz")  +
@@ -325,7 +333,7 @@ tm_shape(tww) +
 tww_landquart <- st_intersection(tww, landquart)
 ```
 
-```{r, echo = FALSE}
+```{r, echo = FALSE, fig.height=4.5}
  tm_shape(landquart) +
   tm_borders(col = "black") +
   tm_shape(tww_landquart) + 
@@ -365,8 +373,8 @@ layout: false
 ## Übung 5.12 
 
 - Selektiere die TWW Flächen, welche sich zumindest Teilweise in der Gemeinde Landquart befinden und speichere den Output als `tww_landquart2`
-- Visualiere das Resultat mit `tmap`
-- vergleiche `tww_landquart2` mit `tww_landquart`. Wie unterscheiden sich diese?
+- Visualisiere das Resultat mit `tmap`
+- Vergleiche `tww_landquart2` mit `tww_landquart`. Wie unterscheiden sich diese?
 
 --
 
@@ -377,7 +385,7 @@ tww_landquart2 <- tww[landquart, ]
 ```
 
 
-```{r, echo = FALSE, fig.height=4.5}
+```{r, echo = FALSE, fig.height=4.0}
  tm_shape(landquart) +
   tm_borders(col = "black") +
   tm_shape(tww_landquart2) + 
@@ -396,7 +404,7 @@ Exportiere `tww_landquart2` als Geopackage
 ## Lösung
 
 
-```{r, echo = FALSE}
+```{r, warning=FALSE, message=FALSE}
 st_write(tww_landquart2, "_data/processed/tww_landquart.gpkg", delete_layer = TRUE)
 ```
 

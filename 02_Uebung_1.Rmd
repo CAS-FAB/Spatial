@@ -110,7 +110,7 @@ library(sf)            # laden (ohne Anführungs- und Schlusszeichen)
 
 Wir machen nun aus dem `data.frame` `ausserberg` ein Vektor-Objekt und verwenden dazu die Funktion `st_as_sf()` aus der eben installierten Library `sf`. 
 
-Mit dem Argument `coords = ` informieren wir dieser Funktion, wo unsere Koordinateninformation liegt. Probiere etwas rum bis es funktiniert und weise *danach* das Neue Objekt der Variabel `ausserberg_sf` zu.
+Mit dem Argument `coords = ` informieren wir dieser Funktion, wo unsere Koordinateninformation liegt. Probiere etwas rum bis es funktioniert und weise *danach* das Neue Objekt der Variabel `ausserberg_sf` zu.
 
 --
 
@@ -291,7 +291,7 @@ Bounding box:  xmin: 2631175 ymin: 1129752 xmax: 2631210 ymax: 1129910
 ## Übung 1.9 <!--2-->
 
 - `R` weiss nun, das es sich bei `aussenberg_sf`um einen Vektordatensatz handelt 
-- `aussenberg_sf` reagiert nun anders auf gewisse funktions
+- `aussenberg_sf` reagiert nun anders auf gewisse functions
 - teste die Funktion `plot` mit `aussenberg_sf`
 
 --
@@ -503,7 +503,7 @@ class: highlight-last-item
 
 --
   - ist nur sinnvoll, wenn das Koordinatensystem nicht oder falsch zugewiesen wurde
-  
+
 --
 - Koordinatenbezugssystem*transformieren* 
 

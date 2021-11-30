@@ -9,19 +9,19 @@ source("functions.R", local = knitr::knit_global())
 ### Input Raster
 
 ```{r, echo = FALSE}
-aufwand("04_Input_Raster")
+show_slide("04_Input_Raster")
 ```
 
 
 ### Übung 3
 
 ```{r, echo = FALSE}
-aufwand("05_Uebung_3")
+show_slide("05_Uebung_3")
 ```
 
 ### Übung 4
 
 
 ```{r, echo = FALSE}
-aufwand("06_Uebung_4")
+show_slide("06_Uebung_4")
 ```

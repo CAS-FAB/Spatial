@@ -34,3 +34,19 @@ title: "CAS Vegetationsanalyse"
 - Einloggen: https://rstudioforswitchhub.zhaw.ch
 
 
+## Hilfe 
+
+- [GeocompR](https://geocompr.robinlovelace.net/)
+- [Spatial Data Science with R and "terra"](https://rspatial.org/terra/index.html)
+
+
+## PDF Files aller Slides:
+
+```{r, results='asis', echo=FALSE}
+list.files(pattern = "\\d{2}_.+\\.pdf$", path = "_site") |>
+  stringr::str_match("\\d{2}_(.+)\\.pdf") |>
+  apply(1, function(x){paste0("- [",x[2],"]","(",x[1],")")}) |>
+  cat(sep = "\n")
+  
+```
+

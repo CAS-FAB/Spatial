@@ -38,6 +38,7 @@ R eignet sich hervorragend um ein Sampling Design umzusetzen
 library(sf)
 library(terra)
 library(tmap)
+tmap_mode("plot")
 
 tww_landquart <- read_sf("_data/processed/tww_landquart.gpkg")
 ```
@@ -67,7 +68,7 @@ sample_plots1 <- st_sample(tww_landquart, size = tww_landquart$equal_samples)
 ```
 
 
-```{r, echo = FALSE, fig.height=5.5}
+```{r, echo = FALSE, fig.height=5.5, message=FALSE}
 base_plot +
   tm_shape(sample_plots1) +
   tm_dots(shape = 3)

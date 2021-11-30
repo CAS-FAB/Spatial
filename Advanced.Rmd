@@ -9,13 +9,13 @@ source("functions.R", local = knitr::knit_global())
 ### GIS Layers
 
 ```{r, echo = FALSE}
-aufwand("07_GIS_Layers")
+show_slide("07_GIS_Layers")
 ```
 
 ### Sampling Design
 
 ```{r, echo = FALSE}
-aufwand("08_Sampling_Design")
+show_slide("08_Sampling_Design")
 ```
 
 

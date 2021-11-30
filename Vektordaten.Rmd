@@ -8,13 +8,13 @@ source("functions.R", local = knitr::knit_global())
 ### Übung 1
 
 ```{r, echo = FALSE}
-aufwand("02_Uebung_1")
+show_slide("02_Uebung_1")
 ```
 
 ### Übung 2
 
 
 ```{r, echo = FALSE}
-aufwand("03_Uebung_2")
+show_slide("03_Uebung_2")
 ```
 
